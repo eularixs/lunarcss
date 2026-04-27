@@ -1,0 +1,107 @@
+{
+  "name": "lunarcss",
+  "version": "0.0.0",
+  "description": "Plug-and-play Tailwind v4 styling engine for React Native and Web",
+  "license": "MIT",
+  "author": "Eularix Team",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "lunarcss": "./dist/cli/index.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "react-native": "./dist/index.js",
+      "browser": "./dist/index.web.js",
+      "default": "./dist/index.js"
+    },
+    "./babel-plugin": {
+      "types": "./dist/babel-plugin/index.d.ts",
+      "default": "./dist/babel-plugin/index.js"
+    },
+    "./metro": {
+      "types": "./dist/metro/config.d.ts",
+      "default": "./dist/metro/config.js"
+    },
+    "./metro/transformer": {
+      "types": "./dist/metro/transformer.d.ts",
+      "default": "./dist/metro/transformer.js"
+    },
+    "./web/plugin": {
+      "types": "./dist/web/plugin.d.ts",
+      "default": "./dist/web/plugin.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts"
+    },
+    "./runtime": {
+      "types": "./dist/runtime/tw.d.ts",
+      "react-native": "./dist/runtime/tw.js",
+      "browser": "./dist/runtime/tw.web.js",
+      "default": "./dist/runtime/tw.js"
+    },
+    "./__theme__": {
+      "types": "./dist/__theme__.d.ts",
+      "default": "./dist/__theme__.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "react-native",
+    "tailwind",
+    "tailwindcss",
+    "tailwind-v4",
+    "styling",
+    "css",
+    "nativewind-alternative",
+    "expo",
+    "next"
+  ],
+  "dependencies": {
+    "culori": "^4.0.1",
+    "jiti": "^2.4.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-native": ">=0.73.0"
+  },
+  "peerDependenciesMeta": {
+    "react-native": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@babel/generator": "^7.25.0",
+    "@babel/parser": "^7.25.0",
+    "@babel/traverse": "^7.25.0",
+    "@babel/types": "^7.25.0",
+    "@types/babel__generator": "^7.6.8",
+    "@types/babel__traverse": "^7.20.6",
+    "@types/culori": "^2.1.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.3.0",
+    "react": "^18.3.0",
+    "react-native": "^0.76.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
