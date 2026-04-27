@@ -1,0 +1,115 @@
+---
+title: Token Namespace Map
+description: How theme.extend keys map to CSS variables and utility class names.
+---
+
+## Full mapping table
+
+| `theme.extend.<ns>` | CSS variable prefix | Class form | Example |
+| :-- | :-- | :-- | :-- |
+| `colors` | `--color-` | `bg-*` `text-*` `border-*` | `bg-primary` |
+| `spacing` | `--spacing-` | `p-*` `m-*` `gap-*` | `p-card` |
+| `fontSize` | `--text-` | `text-*` | `text-display` |
+| `fontWeight` | `--font-weight-` | `font-*` | `font-medium` |
+| `fontFamily` | `--font-family-` | `font-[name]` | `font-[Inter]` |
+| `borderRadius` | `--radius-` | `rounded-*` | `rounded-card` |
+| `width` | `--width-` | `w-*` | `w-card` |
+| `height` | `--height-` | `h-*` | `h-card` |
+| `minWidth` | `--min-width-` | `min-w-*` | `min-w-card` |
+| `maxWidth` | `--max-width-` | `max-w-*` | `max-w-prose` |
+| `minHeight` | `--min-height-` | `min-h-*` | `min-h-screen` |
+| `maxHeight` | `--max-height-` | `max-h-*` | `max-h-screen` |
+| `letterSpacing` | `--tracking-` | `tracking-*` | `tracking-wide` |
+| `lineHeight` | `--leading-` | `leading-*` | `leading-relaxed` |
+
+## fontSize tuple
+
+When `fontSize` value is a `[size, lineHeight]` tuple, two CSS variables are emitted:
+
+```ts
+fontSize: {
+  display: ['48px', '52px'],
+}
+```
+
+Emits:
+```css
+@theme {
+  --text-display: 48px;
+  --text-display--line-height: 52px;
+}
+```
+
+The resolver reads both automatically when you use `text-display` on mobile.
+
+## Example: full token definition
+
+```ts
+import { defineConfig } from 'lunarcss'
+
+export default defineConfig({
+  theme: {
+    extend: {
+      colors: {
+        brand: '#6366f1',
+        'brand-dark': '#4f46e5',
+        muted: 'oklch(0.6 0.02 264)',
+      },
+      spacing: {
+        xs: '4px',
+        sm: '8px',
+        md: '16px',
+        lg: '24px',
+        xl: '32px',
+        card: '24px',
+      },
+      borderRadius: {
+        card: '14px',
+        pill: '9999px',
+      },
+      fontSize: {
+        display: ['48px', '52px'],
+        hero: ['72px', '76px'],
+      },
+      width: {
+        card: '320px',
+        sidebar: '240px',
+      },
+      maxWidth: {
+        content: '768px',
+      },
+    },
+  },
+})
+```
+
+Resulting CSS variables (sorted):
+
+```css
+@theme {
+  --color-brand: #6366f1;
+  --color-brand-dark: #4f46e5;
+  --color-muted: oklch(0.6 0.02 264);
+  --max-width-content: 768px;
+  --radius-card: 14px;
+  --radius-pill: 9999px;
+  --spacing-card: 24px;
+  --spacing-lg: 24px;
+  --spacing-md: 16px;
+  --spacing-sm: 8px;
+  --spacing-xl: 32px;
+  --spacing-xs: 4px;
+  --text-display: 48px;
+  --text-display--line-height: 52px;
+  --text-hero: 72px;
+  --text-hero--line-height: 76px;
+  --width-card: 320px;
+  --width-sidebar: 240px;
+}
+```
+
+## OKLCH on mobile
+
+OKLCH color values are converted to the nearest sRGB hex via `culori` before being applied on React Native. Wide-gamut values lose chroma. Use sRGB-safe OKLCH or a hex fallback for mobile precision.
+
+Dev builds emit a console warning when an OKLCH value is clamped.

@@ -1,0 +1,101 @@
+---
+title: Modifiers
+description: Platform, color scheme, state, and responsive modifiers — and how they stack.
+---
+
+## Overview
+
+Modifiers prefix any utility class and gate its application on a condition. Stack multiple modifiers left-to-right — all conditions must match.
+
+```tsx
+<View className="dark:active:bg-primary/80" />
+// Applied only when: dark mode AND active state
+```
+
+## Four tiers
+
+| Tier | Modifiers | Reactive on mobile |
+| :-- | :-- | :-- |
+| 1 — Platform | `ios:` `android:` `web:` | Static (checked once at load) |
+| 2 — Color scheme | `dark:` `light:` | Yes — `Appearance.addChangeListener` |
+| 3 — State | `active:` `disabled:` `focus:` `hover:` `pressed:` | Yes — component event handlers |
+| 4 — Responsive | `sm:` `md:` `lg:` `xl:` `2xl:` | Yes — `Dimensions.addEventListener` |
+
+## Platform modifiers
+
+```tsx
+<Text className="ios:font-semibold android:font-normal" />
+<View className="web:hidden" />        // hidden on web only
+<View className="ios:mt-12 android:mt-8" />  // SafeAreaView offset
+```
+
+Platform is evaluated once at app load from `Platform.OS`.
+
+## Color scheme modifiers
+
+```tsx
+<View className="bg-white dark:bg-zinc-900" />
+<Text className="text-zinc-900 dark:text-white" />
+```
+
+Reactive: when the user switches system appearance, LunarCSS invalidates the `__color-scheme__` token in the cache and re-renders components that use dark/light classes.
+
+## State modifiers
+
+```tsx
+// Press feedback
+<Pressable className="bg-primary active:bg-primary/80">
+  <Text>Button</Text>
+</Pressable>
+
+// Disabled state
+<TouchableOpacity className="opacity-100 disabled:opacity-50" disabled={isLoading} />
+
+// Hover (web / pointer devices)
+<View className="hover:bg-zinc-800" />
+
+// Focus (TextInput)
+<TextInput className="border-zinc-700 focus:border-primary" />
+```
+
+State modifiers wire to the appropriate RN event system. `active:`/`pressed:` use `Pressable`'s `pressed` state. `focus:` uses `onFocus`/`onBlur`. `hover:` uses `onHoverIn`/`onHoverOut` (web + pointer devices).
+
+## Responsive modifiers
+
+```tsx
+// Mobile first: full width, then fixed on md+
+<View className="w-full md:w-card" />
+
+// Stack vertically on mobile, side by side on lg+
+<View className="flex-col lg:flex-row" />
+```
+
+Breakpoints (default, matches Tailwind v4):
+
+| Modifier | Min width |
+| :-- | :-- |
+| `sm:` | 640px |
+| `md:` | 768px |
+| `lg:` | 1024px |
+| `xl:` | 1280px |
+| `2xl:` | 1536px |
+
+On mobile, breakpoints are evaluated against `Dimensions.get('window').width` and re-evaluated on `Dimensions.addEventListener('change')`.
+
+## Stacking
+
+Modifiers are evaluated left-to-right. All must match:
+
+```tsx
+// Applied only on iOS, dark mode, when active
+<View className="ios:dark:active:bg-zinc-800" />
+
+// Applied on md+ in dark mode
+<View className="md:dark:bg-zinc-900" />
+```
+
+Precedence tiers are enforced — lower-tier modifiers take visual priority when classes conflict.
+
+## Unknown modifiers
+
+Unknown modifiers (not in any of the four tiers) emit a dev-only `console.warn` and resolve to `false` (class is skipped). This catches typos.

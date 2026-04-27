@@ -1,0 +1,84 @@
+---
+title: lunar.config.ts
+description: The single source of truth for design tokens across native and web.
+---
+
+## Overview
+
+`lunar.config.ts` is the only file that controls your design tokens for **both** React Native and web. Metro reads it at build time to emit a virtual `__theme__` module. The PostCSS plugin reads it to emit an `@theme {}` block for Tailwind v4.
+
+No CSS parsing on mobile. No separate token files. One file, both platforms.
+
+## Basic structure
+
+```ts
+import { defineConfig } from 'lunarcss'
+
+export default defineConfig({
+  theme: {
+    extend: {
+      colors: {
+        primary: 'oklch(0.6 0.2 264)',
+        accent: '#f59e0b',
+      },
+      spacing: {
+        xs: '4px',
+        card: '24px',
+      },
+      borderRadius: {
+        card: '14px',
+      },
+      fontSize: {
+        display: ['48px', '52px'], // [size, lineHeight]
+      },
+      width: {
+        card: '320px',
+      },
+    },
+  },
+})
+```
+
+Everything under `theme.extend` maps to Tailwind v4 CSS custom properties. The mapping is:
+
+| `theme.extend.<key>` | CSS variable prefix | Example class |
+| :-- | :-- | :-- |
+| `colors.primary` | `--color-primary` | `bg-primary` |
+| `spacing.card` | `--spacing-card` | `p-card` |
+| `borderRadius.card` | `--radius-card` | `rounded-card` |
+| `fontSize.display` | `--text-display` | `text-display` |
+| `width.card` | `--width-card` | `w-card` |
+
+See the full [Token Namespace Map](/docs/configuration/token-namespace-map) for all supported keys.
+
+## `defineConfig`
+
+```ts
+import { defineConfig } from 'lunarcss'
+```
+
+`defineConfig` is a pass-through identity function that provides TypeScript autocompletion. It returns the config object unchanged — no magic at import time.
+
+## TypeScript types
+
+The `LunarConfig` and `ThemeExtend` types are exported for manual use:
+
+```ts
+import type { LunarConfig, ThemeExtend } from 'lunarcss'
+```
+
+## Config discovery
+
+Both Metro and the PostCSS plugin auto-discover `lunar.config.ts` by scanning from the project root. Supported filenames (checked in order):
+
+1. `lunar.config.ts`
+2. `lunar.config.mts`
+3. `lunar.config.js`
+4. `lunar.config.mjs`
+5. `lunar.config.cjs`
+
+## Hot-reload
+
+**Web (Next.js / Vite / Webpack)**: editing `lunar.config.ts` triggers an automatic PostCSS re-run because the plugin registers it as a build dependency.
+
+**Native (Metro)**: requires a Metro restart. Content-hash delta checking ensures the `__theme__.js` virtual file is only rewritten when tokens actually change.

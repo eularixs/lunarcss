@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+jobs:
+  ci:
+    name: Typecheck · Test · Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test with coverage
+        run: pnpm test:coverage
+
+      - name: Build
+        run: pnpm build
+
+      - name: Bundle size check
+        run: |
+          GZIP_SIZE=$(gzip -c dist/index.js | wc -c)
+          THRESHOLD=10240
+          echo "dist/index.js gzip: ${GZIP_SIZE} bytes (threshold: ${THRESHOLD})"
+          if [ "${GZIP_SIZE}" -gt "${THRESHOLD}" ]; then
+            echo "::warning file=dist/index.js::Core bundle exceeds 10 kb gzip (${GZIP_SIZE} bytes). Review imports."
+          fi
+
+      - name: SonarQube scan
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}

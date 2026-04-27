@@ -31,7 +31,19 @@ export function resolveClassList(
       continue
     }
 
-    Object.assign(merged, result.style)
+    for (const key of Object.keys(result.style)) {
+      const incoming = result.style[key]
+      if (key === 'transform' && Array.isArray(incoming)) {
+        const existing = merged.transform
+        if (Array.isArray(existing)) {
+          merged.transform = [...existing, ...incoming]
+        } else {
+          merged.transform = [...incoming]
+        }
+        continue
+      }
+      merged[key] = incoming as never
+    }
     for (const t of result.tokensUsed) {
       if (!seenTokens.has(t)) {
         seenTokens.add(t)

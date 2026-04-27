@@ -1,0 +1,314 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
+/* ================================================================
+   LunarCSS brand theme
+   Single source of truth — overrides Fumadocs tokens.
+   Brand accent = indigo/violet (matches landing-page gradient).
+   ================================================================ */
+
+@theme {
+  /* Light mode tokens */
+  --color-fd-primary: hsl(243, 75%, 59%);
+  --color-fd-primary-foreground: hsl(0, 0%, 100%);
+  --color-fd-ring: hsl(243, 75%, 59%);
+  --color-fd-accent: hsl(243, 60%, 96%);
+  --color-fd-accent-foreground: hsl(243, 70%, 30%);
+
+  /* Brand-specific extensions used by custom CSS below */
+  --color-brand-50: hsl(244, 100%, 97%);
+  --color-brand-200: hsl(244, 80%, 86%);
+  --color-brand-400: hsl(244, 88%, 70%);
+  --color-brand-500: hsl(243, 75%, 59%);
+  --color-brand-600: hsl(243, 70%, 50%);
+  --color-brand-700: hsl(243, 70%, 40%);
+}
+
+.dark {
+  --color-fd-background: hsl(240, 10%, 4%);
+  --color-fd-foreground: hsl(240, 10%, 96%);
+
+  --color-fd-primary: hsl(244, 90%, 72%);
+  --color-fd-primary-foreground: hsl(240, 10%, 4%);
+  --color-fd-ring: hsl(244, 90%, 72%);
+
+  --color-fd-accent: hsl(244, 30%, 16%);
+  --color-fd-accent-foreground: hsl(244, 90%, 88%);
+
+  --color-fd-card: hsl(240, 8%, 7%);
+  --color-fd-card-foreground: hsl(240, 10%, 96%);
+
+  --color-fd-popover: hsl(240, 8%, 6%);
+  --color-fd-popover-foreground: hsl(240, 10%, 96%);
+
+  --color-fd-secondary: hsl(244, 20%, 14%);
+  --color-fd-secondary-foreground: hsl(240, 10%, 96%);
+
+  --color-fd-muted: hsl(240, 6%, 10%);
+  --color-fd-muted-foreground: hsl(240, 5%, 68%);
+
+  --color-fd-border: hsla(244, 30%, 50%, 0.2);
+}
+
+/* ================================================================
+   Layout primitives
+   ================================================================ */
+
+html {
+  scrollbar-gutter: stable;
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0px !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+
+/* ================================================================
+   Selection — branded
+   ================================================================ */
+
+::selection {
+  background-color: color-mix(in oklab, var(--color-fd-primary) 35%, transparent);
+  color: var(--color-fd-foreground);
+}
+
+/* ================================================================
+   Focus rings — strong visible outline on every focusable
+   ================================================================ */
+
+*:focus-visible {
+  outline: 2px solid var(--color-fd-ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ================================================================
+   Sidebar — active link gets brand accent + left bar
+   ================================================================ */
+
+#nd-sidebar a[data-active='true'] {
+  background-color: color-mix(
+    in oklab,
+    var(--color-fd-primary) 12%,
+    transparent
+  );
+  color: var(--color-fd-primary);
+  font-weight: 600;
+  position: relative;
+}
+
+#nd-sidebar a[data-active='true']::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  border-radius: 2px;
+  background-color: var(--color-fd-primary);
+}
+
+#nd-sidebar a:hover {
+  color: var(--color-fd-foreground);
+}
+
+/* Section divider headings in sidebar */
+#nd-sidebar p[data-active] {
+  color: var(--color-fd-muted-foreground);
+}
+
+/* ================================================================
+   TOC — branded active item
+   ================================================================ */
+
+#nd-toc a[data-active='true'],
+.fd-toc a[data-active='true'] {
+  color: var(--color-fd-primary);
+  font-weight: 600;
+}
+
+/* ================================================================
+   Body links — branded underline
+   ================================================================ */
+
+article a:not([data-card]):not(.not-prose a) {
+  color: var(--color-fd-primary);
+  text-decoration-color: color-mix(
+    in oklab,
+    var(--color-fd-primary) 50%,
+    transparent
+  );
+  text-underline-offset: 3px;
+  transition: text-decoration-color 150ms ease;
+}
+
+article a:not([data-card]):hover {
+  text-decoration-color: var(--color-fd-primary);
+}
+
+/* ================================================================
+   Inline code — branded tint
+   ================================================================ */
+
+article :not(pre) > code {
+  background-color: color-mix(
+    in oklab,
+    var(--color-fd-primary) 10%,
+    var(--color-fd-muted)
+  );
+  color: color-mix(in oklab, var(--color-fd-primary) 70%, var(--color-fd-foreground));
+  border: 1px solid
+    color-mix(in oklab, var(--color-fd-primary) 18%, transparent);
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 0.875em;
+  font-weight: 500;
+}
+
+/* ================================================================
+   Headings — anchor link hover affordance + brand accent on h2
+   ================================================================ */
+
+article h2 {
+  position: relative;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-fd-border);
+}
+
+article h2::before {
+  content: '';
+  position: absolute;
+  left: -16px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 1.4em;
+  border-radius: 2px;
+  background: linear-gradient(
+    180deg,
+    var(--color-fd-primary),
+    color-mix(in oklab, var(--color-fd-primary) 40%, transparent)
+  );
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+article h2:hover::before {
+  opacity: 1;
+}
+
+article h2 a.subheading-anchor,
+article h3 a.subheading-anchor,
+article h4 a.subheading-anchor {
+  color: var(--color-fd-primary);
+}
+
+/* ================================================================
+   Callouts — branded left border + tinted background
+   ================================================================ */
+
+div[data-card],
+.fd-callout {
+  border-left: 3px solid var(--color-fd-primary);
+  background-color: color-mix(
+    in oklab,
+    var(--color-fd-primary) 6%,
+    var(--color-fd-card)
+  );
+}
+
+/* ================================================================
+   Code blocks — branded top accent line
+   ================================================================ */
+
+article figure[data-rehype-pretty-code-figure],
+article pre {
+  position: relative;
+  border: 1px solid var(--color-fd-border);
+  background-color: var(--color-fd-card) !important;
+}
+
+/* ================================================================
+   Tables — branded header
+   ================================================================ */
+
+article table thead {
+  background-color: color-mix(
+    in oklab,
+    var(--color-fd-primary) 8%,
+    var(--color-fd-muted)
+  );
+}
+
+article table thead th {
+  color: var(--color-fd-foreground);
+  font-weight: 600;
+}
+
+article table tbody tr {
+  transition: background-color 120ms ease;
+}
+
+article table tbody tr:hover {
+  background-color: color-mix(
+    in oklab,
+    var(--color-fd-primary) 5%,
+    transparent
+  );
+}
+
+/* ================================================================
+   Buttons (primary action) — landing CTA already inline-styled,
+   but generic .fd-button gets strong default
+   ================================================================ */
+
+.fd-button-primary,
+button[data-fd-button='primary'] {
+  background: linear-gradient(
+    180deg,
+    var(--color-brand-400, var(--color-fd-primary)),
+    var(--color-fd-primary)
+  );
+  color: var(--color-fd-primary-foreground);
+  border: 1px solid color-mix(in oklab, var(--color-fd-primary) 50%, black);
+  box-shadow: 0 6px 24px -6px color-mix(in oklab, var(--color-fd-primary) 50%, transparent);
+}
+
+/* ================================================================
+   Badges — branded variant
+   ================================================================ */
+
+[data-badge='primary'] {
+  background-color: color-mix(
+    in oklab,
+    var(--color-fd-primary) 15%,
+    transparent
+  );
+  color: var(--color-fd-primary);
+  border: 1px solid color-mix(in oklab, var(--color-fd-primary) 30%, transparent);
+}
+
+/* ================================================================
+   Scrollbar — subtle, branded on hover
+   ================================================================ */
+
+* {
+  scrollbar-color: var(--color-fd-border) transparent;
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-fd-border);
+  border-radius: 8px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in oklab, var(--color-fd-primary) 50%, var(--color-fd-border));
+}

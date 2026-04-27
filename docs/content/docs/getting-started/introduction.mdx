@@ -1,0 +1,60 @@
+---
+title: Introduction
+description: What LunarCSS is, why it exists, and how it compares to alternatives.
+---
+
+## What is LunarCSS?
+
+LunarCSS is a plug-and-play **Tailwind v4** styling engine for **React Native and Web**. Write `className` once — it works on iOS, Android, and the browser with zero runtime divergence.
+
+## Why not NativeWind or TWRNC?
+
+| Problem | LunarCSS |
+| :-- | :-- |
+| NativeWind setup is complex | `lunarcss init` — single command |
+| TWRNC is locked to Tailwind v3 | Native Tailwind v4 support |
+| TWRNC has no web support | Same `className` works on RN + Web |
+| TWRNC resolves at runtime every render | Build-time extraction + LRU cache |
+| Reanimated conflict via JSX transform | Metro-layer transform — zero clash |
+| Static themes only | Reactive CSS variables via `lunar.config.ts` |
+| Manual rewrite per Tailwind update | Modular utility groups |
+
+## Architecture in 30 seconds
+
+```
+<View className="flex-1 bg-zinc-900" />
+        │
+   Metro Transformer          (className → __lcssTw())
+        │
+   Platform detect
+   ┌────┴────┐
+Mobile     Web
+   │          │
+Resolver   passthrough → Tailwind CSS
++ Cache
+   │
+StyleSheet
+```
+
+On **mobile**, LunarCSS converts class names to `StyleSheet`-compatible objects at Metro build time, with an LRU cache keyed to a theme hash. On **web**, the `className` prop passes through as-is — Tailwind's browser engine handles it.
+
+## Single token source
+
+One `lunar.config.ts` file drives both platforms. Metro reads it at build time to emit a virtual `__theme__` module. The PostCSS plugin reads it to emit an `@theme {}` block for Tailwind v4.
+
+```
+lunar.config.ts
+      │
+  flattenTokens()
+  ┌───┴───┐
+Mobile   Web
+Metro    PostCSS → @theme {}
+__theme__.js
+```
+
+## Key properties
+
+- **Zero Reanimated conflict** — transform happens inside Metro's serializer, not in Babel's JSX transform pipeline
+- **Tailwind v4 first-class** — `@theme` CSS variables, oklch colors, all v4 modifiers
+- **240 tests** — utility groups, Metro transform, PostCSS plugin, CLI init, token loading
+- **9.18 kb gzip** — core bundle, no unnecessary runtime overhead

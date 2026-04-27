@@ -1,0 +1,92 @@
+---
+title: TypeScript Setup
+description: Adding className support to React Native components via type augmentation.
+---
+
+## Add to tsconfig.json
+
+```json
+{
+  "compilerOptions": {
+    "types": ["lunarcss/types"]
+  }
+}
+```
+
+`lunarcss init` does this automatically.
+
+## What gets augmented
+
+LunarCSS augments the `ViewProps`, `TextProps`, `TextInputProps`, `ImageProps`, and other base interfaces in `react-native` to accept a `className?: string` prop:
+
+| Component | Augmented props interface |
+| :-- | :-- |
+| `View` | `ViewProps` |
+| `Text` | `TextProps` |
+| `TextInput` | `TextInputProps` |
+| `Image` | `ImageProps` |
+| `ScrollView` | `ScrollViewProps` |
+| `TouchableOpacity` | `TouchableOpacityProps` |
+| `Pressable` | `PressableProps` |
+| `FlatList` | `FlatListProps` |
+| `SectionList` | `SectionListProps` |
+| `Modal` | `ModalProps` |
+
+After adding `"lunarcss/types"`, TypeScript accepts `className` on all these components:
+
+```tsx
+import { View, Text } from 'react-native'
+
+// ✅ No TypeScript error
+<View className="flex-1 bg-zinc-900" />
+<Text className="text-white text-lg font-bold" />
+```
+
+## Without the types
+
+Without `"lunarcss/types"` in `tsconfig.json`, TypeScript will error:
+
+```
+Property 'className' does not exist on type 'IntrinsicAttributes & ViewProps'
+```
+
+## Custom component types
+
+If you build wrapper components that forward `className`, extend the relevant props:
+
+```tsx
+import type { ViewProps } from 'react-native'
+
+interface CardProps extends ViewProps {
+  className?: string
+}
+
+export function Card({ className, ...rest }: CardProps) {
+  return <View className={className} {...rest} />
+}
+```
+
+## `LunarConfig` type
+
+Use for typed config in helper utilities:
+
+```ts
+import type { LunarConfig } from 'lunarcss'
+
+function buildTheme(config: LunarConfig) {
+  // ...
+}
+```
+
+## `ThemeExtend` type
+
+For typed `theme.extend` objects:
+
+```ts
+import type { ThemeExtend } from 'lunarcss'
+
+const myTokens: ThemeExtend = {
+  colors: { primary: '#6366f1' },
+  spacing: { card: '24px' },
+}
+```

@@ -1,0 +1,86 @@
+---
+title: Effects
+description: Opacity and shadow utilities.
+---
+
+## Opacity
+
+```
+opacity-0      → opacity: 0
+opacity-5      → opacity: 0.05
+opacity-10     → opacity: 0.10
+opacity-20     → opacity: 0.20
+opacity-25     → opacity: 0.25
+opacity-30     → opacity: 0.30
+opacity-40     → opacity: 0.40
+opacity-50     → opacity: 0.50
+opacity-60     → opacity: 0.60
+opacity-70     → opacity: 0.70
+opacity-75     → opacity: 0.75
+opacity-80     → opacity: 0.80
+opacity-90     → opacity: 0.90
+opacity-95     → opacity: 0.95
+opacity-100    → opacity: 1
+opacity-[0.42] → opacity: 0.42  (arbitrary)
+```
+
+## Shadow
+
+### Named scale
+
+```
+shadow-none  → clears all shadow props
+shadow-sm    → subtle shadow
+shadow       → default shadow
+shadow-md    → medium shadow
+shadow-lg    → large shadow
+shadow-xl    → extra large shadow
+shadow-2xl   → 2x extra large shadow
+```
+
+### React Native output
+
+Each `shadow-*` class emits **all** required React Native shadow props together:
+
+```js
+{
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: Y },
+  shadowOpacity: O,
+  shadowRadius: R,
+  elevation: E,          // Android
+}
+```
+
+The `elevation` value is set alongside the iOS shadow props — you don't need separate `elevation` classes.
+
+### Shadow scale values
+
+| Class | height | opacity | radius | elevation |
+| :-- | :-- | :-- | :-- | :-- |
+| `shadow-sm` | 1 | 0.05 | 1 | 1 |
+| `shadow` | 2 | 0.10 | 2 | 2 |
+| `shadow-md` | 4 | 0.12 | 4 | 4 |
+| `shadow-lg` | 8 | 0.14 | 8 | 8 |
+| `shadow-xl` | 12 | 0.16 | 12 | 12 |
+| `shadow-2xl` | 16 | 0.20 | 16 | 16 |
+
+## Examples
+
+```tsx
+// Dimmed overlay
+<View className="absolute inset-0 bg-black opacity-50" />
+
+// Fade a disabled button
+<TouchableOpacity className="opacity-50" disabled>
+  <Text>Disabled</Text>
+</TouchableOpacity>
+
+// Card shadow
+<View className="rounded-card p-card bg-white shadow-lg">
+  <Text>Card with shadow</Text>
+</View>
+
+// Subtle input shadow
+<TextInput className="rounded-lg bg-zinc-900 px-4 py-3 shadow-sm" />
+```

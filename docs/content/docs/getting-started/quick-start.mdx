@@ -1,0 +1,161 @@
+---
+title: Quick Start
+description: Set up LunarCSS in Expo, Next.js, or bare React Native in under two minutes.
+---
+
+## Expo
+
+```bash
+cd my-expo-app
+npx lunarcss init
+```
+
+Generated files:
+
+```
+lunar.config.ts        # token source of truth
+metro.config.js        # withLunarCSS wrapped
+.gitignore             # .lunarcss/ ignored
+tsconfig.json          # types: ["lunarcss/types"] appended
+```
+
+Use `className` immediately:
+
+```tsx
+import { View, Text } from 'react-native'
+
+export default function Screen() {
+  return (
+    <View className="flex-1 items-center justify-center bg-zinc-900">
+      <Text className="text-2xl font-bold text-white">Hello LunarCSS</Text>
+    </View>
+  )
+}
+```
+
+Start the dev server:
+
+```bash
+npx expo start
+```
+
+---
+
+## Next.js
+
+```bash
+cd my-next-app
+npx lunarcss init
+```
+
+Generated files:
+
+```
+lunar.config.ts
+app/globals.css        # @import "tailwindcss" + @plugin "lunarcss"
+.gitignore
+tsconfig.json
+```
+
+Add the PostCSS plugin to `postcss.config.js`:
+
+```js
+module.exports = {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    lunarcss: {},
+  },
+}
+```
+
+Import `globals.css` from your root layout:
+
+```tsx
+// app/layout.tsx
+import './globals.css'
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  )
+}
+```
+
+Use `className` as usual — Tailwind compiles it, custom tokens work cross-platform:
+
+```tsx
+export default function Page() {
+  return (
+    <main className="flex min-h-screen flex-col items-center bg-zinc-950 p-24">
+      <h1 className="text-4xl font-bold text-white">Hello LunarCSS</h1>
+    </main>
+  )
+}
+```
+
+---
+
+## React Native (bare)
+
+```bash
+cd my-rn-app
+npx lunarcss init
+```
+
+Same files as Expo, but `metro.config.js` uses `@react-native/metro-config` + `mergeConfig`:
+
+```js
+const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config')
+const { withLunarCSS } = require('lunarcss/metro')
+
+const config = {}
+module.exports = withLunarCSS(mergeConfig(getDefaultConfig(__dirname), config))
+```
+
+---
+
+## Manual setup (no CLI)
+
+If you prefer to wire things manually:
+
+### Mobile
+
+1. Create `lunar.config.ts` (see [Configuration](/docs/configuration/lunar-config))
+2. Wrap `metro.config.js`:
+
+```js
+const { getDefaultConfig } = require('expo/metro-config')
+const { withLunarCSS } = require('lunarcss/metro')
+
+const config = getDefaultConfig(__dirname)
+module.exports = withLunarCSS(config)
+```
+
+3. Add types to `tsconfig.json`:
+
+```json
+{ "compilerOptions": { "types": ["lunarcss/types"] } }
+```
+
+### Web
+
+1. Create `lunar.config.ts`
+2. Add to `postcss.config.js`:
+
+```js
+module.exports = {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    lunarcss: {},
+  },
+}
+```
+
+3. Add to your entry CSS:
+
+```css
+@import "tailwindcss";
+@plugin "lunarcss";
+```

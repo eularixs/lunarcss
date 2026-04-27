@@ -1,0 +1,46 @@
+---
+title: AST Merge
+description: How lunarcss init patches an existing metro.config.js without destroying your code.
+---
+
+## What is AST merge?
+
+When `metro.config.js` exists but doesn't yet reference `lunarcss/metro`, the CLI performs an **AST-based merge** instead of overwriting the file. It parses the existing code, inserts only the two required changes, and regenerates the file — leaving everything else untouched.
+
+## The two changes
+
+1. **Add the import** — `const { withLunarCSS } = require('lunarcss/metro')` after the last existing `require()` variable declaration
+2. **Wrap `module.exports`** — `module.exports = withLunarCSS(<existing value>)`
+
+## Example
+
+**Input** (your existing `metro.config.js`):
+
+```js
+const { getDefaultConfig } = require('expo/metro-config')
+const config = getDefaultConfig(__dirname)
+config.resolver.assetExts.push('lottie')
+module.exports = config
+```
+
+**Output** (after AST merge):
+
+```js
+const { getDefaultConfig } = require('expo/metro-config');
+const { withLunarCSS } = require('lunarcss/metro');
+const config = getDefaultConfig(__dirname);
+config.resolver.assetExts.push('lottie');
+module.exports = withLunarCSS(config);
+```
+
+Note: `@babel/generator` normalizes quotes to double-quotes during code generation. Your custom logic (`config.resolver.assetExts.push('lottie')`) is fully preserved.
+
+## When AST merge is skipped
+
+If the file already contains the string `'lunarcss/metro'` (or `"lunarcss/metro"`), the CLI skips it entirely — no re-parsing, no changes.
+
+If the file contains no `module.exports` statement, the CLI also skips and prints a warning recommending manual wiring.
+
+## Powered by
+
+AST parsing uses `@babel/parser` with TypeScript + JSX support. Traversal via `@babel/traverse`. Code generation via `@babel/generator`. These are devDependencies of LunarCSS, not runtime dependencies.

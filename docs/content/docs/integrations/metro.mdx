@@ -1,0 +1,89 @@
+---
+title: Metro (withLunarCSS)
+description: How LunarCSS wires into Metro for React Native and Expo.
+---
+
+## What `withLunarCSS` does
+
+`withLunarCSS(config)` wraps your Metro config and adds three things:
+
+1. **Reads `lunar.config.ts`** — via `jiti` (no CSS parsing, pure TS evaluation)
+2. **Emits `.lunarcss/__theme__.js`** — a frozen JS object of flattened token key→value pairs. Content-hash delta checked — only rewritten when tokens change
+3. **Routes `lunarcss/__theme__`** — adds a `resolveRequest` interceptor that redirects the bare specifier to the generated file
+
+## Setup
+
+```js
+// metro.config.js (Expo)
+const { getDefaultConfig } = require('expo/metro-config')
+const { withLunarCSS } = require('lunarcss/metro')
+
+const config = getDefaultConfig(__dirname)
+module.exports = withLunarCSS(config)
+```
+
+```js
+// metro.config.js (RN bare)
+const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config')
+const { withLunarCSS } = require('lunarcss/metro')
+
+module.exports = withLunarCSS(mergeConfig(getDefaultConfig(__dirname), {}))
+```
+
+## Options
+
+```ts
+withLunarCSS(config, {
+  configFile: '/abs/path/to/lunar.config.ts', // override discovery
+})
+```
+
+## The `__theme__` virtual module
+
+`src/index.ts` imports `THEME_TOKENS` from `'lunarcss/__theme__'`:
+
+```ts
+import { THEME_TOKENS } from 'lunarcss/__theme__'
+import { setTokens } from './runtime/tokens.js'
+setTokens(THEME_TOKENS)
+```
+
+On native:
+- Metro's `resolveRequest` intercepts `'lunarcss/__theme__'`
+- Routes to `.lunarcss/__theme__.js` in the project root
+- `.lunarcss/__theme__.js` contains `export const THEME_TOKENS = Object.freeze({ '--color-primary': '#6366f1', ... })`
+
+On non-Metro environments (tests, web):
+- The bare specifier resolves to `src/__theme__.ts` — an empty `Object.freeze({})` stub
+
+## Metro transformer
+
+`withLunarCSS` sets `babelTransformerPath` to `lunarcss/metro/transformer`. The transformer:
+
+1. Filters to `.tsx` / `.jsx` / `.ts` / `.js` files only
+2. Parses with `@babel/parser` (TypeScript + JSX)
+3. Finds JSX elements that are RN intrinsic components (View, Text, TextInput, etc.)
+4. Converts `className="..."` → `__lcssTw("...")`
+5. Injects `import { __lcssTw } from 'lunarcss/runtime'` if not already present
+6. Passes modified source to the upstream transformer
+
+The upstream transformer is discovered from the previous `babelTransformerPath` or Metro's default. It is stored in `LUNARCSS_UPSTREAM_TRANSFORMER` env and lazy-loaded to avoid circular require.
+
+## Why Metro, not Babel?
+
+Reanimated's Babel plugin rewrites JSX at the Babel stage. If LunarCSS also rewrites JSX at the Babel stage, the two plugins conflict and Reanimated breaks. By operating at Metro's transformer layer (after Babel), LunarCSS avoids the entire conflict.
+
+## `.lunarcss/` directory
+
+LunarCSS writes generated files to `.lunarcss/` at the project root. Add it to `.gitignore`:
+
+```
+# LunarCSS
+.lunarcss/
+```
+
+`lunarcss init` adds this automatically.
+
+## Watch folders
+
+`withLunarCSS` adds the directory containing `lunar.config.ts` to `watchFolders`. This ensures Metro restarts when the config file changes.

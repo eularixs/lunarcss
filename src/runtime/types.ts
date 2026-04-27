@@ -1,9 +1,13 @@
-export type StyleValue = string | number | StyleObjectValue
+export type StyleValue = string | number | StyleObjectValue | TransformOp[]
 
 export interface StyleObjectValue {
   width?: number
   height?: number
   [k: string]: unknown
+}
+
+export interface TransformOp {
+  [k: string]: number | string
 }
 
 export type ResolvedStyle = Record<string, StyleValue>

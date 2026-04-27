@@ -1,0 +1,63 @@
+---
+title: Installation
+description: Install LunarCSS and its peer dependencies.
+---
+
+## Install
+
+```bash
+pnpm add lunarcss
+# or
+npm install lunarcss
+# or
+yarn add lunarcss
+```
+
+## Peer dependencies
+
+| Package | Required | When |
+| :-- | :-- | :-- |
+| `react >=18` | Yes | Always |
+| `react-native >=0.73` | Optional | Native targets only |
+| `postcss >=8.4` | Optional | Web (Next.js / Vite) targets only |
+
+These are already present in any Expo, React Native, or Next.js project — no separate install needed.
+
+## TypeScript types
+
+Add LunarCSS's `className` augmentations to your `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "types": ["lunarcss/types"]
+  }
+}
+```
+
+The `lunarcss init` CLI does this automatically. If you're adding manually, append `"lunarcss/types"` to the existing `types` array.
+
+## What gets installed
+
+```
+lunarcss/               ← core package
+  dist/
+    index.js            ← mobile runtime (resolveClassList, tw())
+    index.web.js        ← web passthrough stub
+    metro/
+      config.js         ← withLunarCSS() Metro wrapper
+      transformer.js    ← AST className → __lcssTw() transform
+    web/
+      plugin.js         ← PostCSS plugin
+    cli/
+      index.js          ← npx lunarcss init
+    runtime/
+      tw.js             ← __lcssTw() runtime helper
+    __theme__.js        ← empty stub (populated by Metro at build time)
+    types/
+      index.d.ts        ← RN component className augmentations
+```
+
+## Node version
+
+Node `>=18` is required for the Metro transformer and CLI. The browser runtime has no Node requirement.

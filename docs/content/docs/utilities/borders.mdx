@@ -1,0 +1,103 @@
+---
+title: Borders
+description: Border radius, border width, border side, and border style utilities.
+---
+
+## Border radius
+
+### Named scale
+
+```
+rounded        → borderRadius: 4
+rounded-none   → borderRadius: 0
+rounded-sm     → borderRadius: 2
+rounded-md     → borderRadius: 6
+rounded-lg     → borderRadius: 8
+rounded-xl     → borderRadius: 12
+rounded-2xl    → borderRadius: 16
+rounded-3xl    → borderRadius: 24
+rounded-full   → borderRadius: 9999
+```
+
+### Per-corner
+
+```
+rounded-t-*    → borderTopLeftRadius + borderTopRightRadius
+rounded-r-*    → borderTopRightRadius + borderBottomRightRadius
+rounded-b-*    → borderBottomLeftRadius + borderBottomRightRadius
+rounded-l-*    → borderTopLeftRadius + borderBottomLeftRadius
+rounded-tl-*   → borderTopLeftRadius
+rounded-tr-*   → borderTopRightRadius
+rounded-br-*   → borderBottomRightRadius
+rounded-bl-*   → borderBottomLeftRadius
+```
+
+### Arbitrary
+
+```tsx
+<View className="rounded-[10px]" />
+<View className="rounded-tl-[20px] rounded-br-[20px]" />
+```
+
+### Token
+
+```ts
+borderRadius: { card: '14px', pill: '9999px' }
+```
+
+```tsx
+<View className="rounded-card" />
+<View className="rounded-pill" />
+```
+
+## Border width
+
+```
+border      → borderWidth: 1  (shorthand, all sides)
+border-0    → borderWidth: 0
+border-2    → borderWidth: 2
+border-4    → borderWidth: 4
+border-8    → borderWidth: 8
+border-t-*  → borderTopWidth
+border-r-*  → borderRightWidth
+border-b-*  → borderBottomWidth
+border-l-*  → borderLeftWidth
+```
+
+## Border color
+
+```tsx
+<View className="border border-primary" />
+<View className="border-2 border-[#6366f1]" />
+<View className="border border-zinc-700 dark:border-zinc-600" />
+```
+
+Border color uses the same [Colors](/docs/utilities/colors) value types (named token, arbitrary, CSS keyword).
+
+## Border style
+
+```
+border-solid   → borderStyle: 'solid'
+border-dashed  → borderStyle: 'dashed'
+border-dotted  → borderStyle: 'dotted'
+```
+
+## Examples
+
+```tsx
+// Card with radius and border
+<View className="rounded-card border border-zinc-800 p-card bg-zinc-900">
+  <Text className="text-white">Card</Text>
+</View>
+
+// Pill button
+<TouchableOpacity className="rounded-full px-6 py-3 bg-primary">
+  <Text className="text-white font-semibold">Button</Text>
+</TouchableOpacity>
+
+// Top border only (divider effect)
+<View className="border-t border-zinc-700" />
+
+// Dashed border
+<View className="rounded-lg border-2 border-dashed border-primary/50 p-4" />
+```

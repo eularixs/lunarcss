@@ -3,7 +3,10 @@
 // colliding with the Lunar Kit CLI.
 
 import { detectProject } from './detect.js'
-import { runInitExpo, type InitExpoReport } from './init-expo.js'
+import { runInitExpo } from './init-expo.js'
+import { runInitBare } from './init-bare.js'
+import { runInitNextjs } from './init-nextjs.js'
+import type { InitStep } from './init-shared.js'
 
 const VERSION = '0.0.0'
 
@@ -14,13 +17,15 @@ Usage:
   lunarcss --help             Show this message
   lunarcss --version          Print version
 
-Currently supported targets:
-  expo        ✅
-  rn-bare     ⏳ pending
-  nextjs      ⏳ pending
+Supported targets: expo · rn-bare · nextjs
 `
 
-function printReport(report: InitExpoReport): void {
+interface Report {
+  steps: InitStep[]
+  warnings: string[]
+}
+
+function printReport(report: Report): void {
   for (const step of report.steps) {
     const symbol =
       step.result.status === 'created'
@@ -51,20 +56,21 @@ function runInit(args: readonly string[]): number {
     console.log(`[lunarcss] Note: ${note}`)
   }
 
+  let report: Report | null = null
   if (detect.kind === 'expo') {
-    const report = runInitExpo({ projectRoot, dryRun })
-    if (dryRun) console.log('[lunarcss] Dry run — no files written.')
-    printReport(report)
-    return 0
-  }
-
-  if (detect.kind === 'unknown') {
+    report = runInitExpo({ projectRoot, dryRun })
+  } else if (detect.kind === 'rn-bare') {
+    report = runInitBare({ projectRoot, dryRun })
+  } else if (detect.kind === 'nextjs') {
+    report = runInitNextjs({ projectRoot, dryRun })
+  } else {
     console.error('[lunarcss] Could not detect Expo / Next.js / RN Bare in this project.')
     return 1
   }
 
-  console.error(`[lunarcss] \`init\` for ${detect.kind} is not yet implemented.`)
-  return 1
+  if (dryRun) console.log('[lunarcss] Dry run — no files written.')
+  printReport(report)
+  return 0
 }
 
 function main(argv: readonly string[]): number {

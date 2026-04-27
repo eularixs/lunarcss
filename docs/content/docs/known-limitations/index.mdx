@@ -1,0 +1,53 @@
+---
+title: Known Limitations
+description: Current limitations in v0.1.0 and their planned status.
+---
+
+## Limitation table
+
+| Limitation | Status | Notes |
+| :-- | :-- | :-- |
+| Hot-reload of `lunar.config.ts` on native | Metro restart required | PostCSS hot-reload works on web. Native content-hash invalidation planned for v0.3.0. |
+| Container queries on mobile | Silently dropped | Not supported by React Native. Web works via Tailwind. `@container` and `@*:` modifiers are no-ops on native — no crash, no warning. |
+| OKLCH on mobile | Clamped to nearest sRGB | Wide-gamut values lose chroma. `culori` converts at resolver time. Dev warning emitted when clamping occurs. Use sRGB-safe OKLCH or a hex fallback for precision. |
+| `animate-*` classes | Skipped with dev warning | Use [`react-native-ease`](https://github.com/marklawlor/react-native-ease) or Reanimated. `tw()` API planned for v0.2.0. |
+| Tailwind v3 fallback resolver | Deferred | v4 is the primary target. Mixed v3/v4 codebases — open an issue. |
+| `color-mix()` on mobile | Not supported | Pre-compute in `lunar.config.ts` using concrete hex or OKLCH values. |
+| Arbitrary background image URL classes on mobile | Skipped | Tailwind URL-based background utilities are not applied on native. Use the `Image` component with a `source` prop instead. |
+| 3rd-party RN components | Babel transformer skips them | Only RN intrinsic components get the `className` transform. Wrap `className`-aware 3rd-party components in your own factory, or use the `style` prop alongside `__lcssTw()`. |
+| Babel-only pipeline | Not supported | Both real RN (Metro) and real web (PostCSS) pipelines have first-class support. A standalone Babel plugin with no Metro is not a supported configuration. |
+
+## OKLCH detail
+
+LunarCSS uses `culori` to convert OKLCH colors to sRGB before passing to `StyleSheet`. The conversion is:
+
+1. Parse OKLCH string
+2. Convert to sRGB
+3. Clamp out-of-gamut channels to [0, 1]
+4. Format as hex
+
+In dev mode, a warning is logged when clamping changes the perceptual lightness by more than a small threshold. In production builds, clamping is silent.
+
+## 3rd-party component detail
+
+The Metro transformer only transforms `className` on elements whose tag name is in the `RN_INTRINSICS` set:
+
+```
+View, Text, TextInput, Image, ScrollView, FlatList, SectionList,
+TouchableOpacity, TouchableHighlight, Pressable, Modal,
+SafeAreaView, KeyboardAvoidingView, ActivityIndicator,
+ImageBackground, VirtualizedList
+```
+
+For 3rd-party components, use the runtime `__lcssTw` directly:
+
+```tsx
+import { __lcssTw } from 'lunarcss/runtime'
+import { SomeThirdPartyComponent } from 'some-library'
+
+<SomeThirdPartyComponent style={__lcssTw('p-4 bg-primary rounded-lg')} />
+```
+
+## Reporting issues
+
+Found a limitation not listed here? [Open an issue](https://github.com/eularix/lunarcss/issues).

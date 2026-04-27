@@ -1,0 +1,109 @@
+---
+title: Transforms
+description: translate, rotate, scale, skew, and transform-none utilities.
+---
+
+## Overview
+
+Transform classes set React Native's `transform` array prop. Multiple transform classes on the same element are **concatenated**, not overwritten — `translate-x-4 rotate-45 scale-110` produces a single `transform: [{translateX: 16}, {rotate: '45deg'}, {scale: 1.1}]`.
+
+## Translate
+
+### Single axis
+
+```
+translate-x-{n}    → { translateX: value }
+translate-y-{n}    → { translateY: value }
+-translate-x-{n}   → { translateX: -value }  (negative)
+-translate-y-{n}   → { translateY: -value }
+```
+
+### Both axes
+
+```
+translate-{n}      → { translateX: value, translateY: value }
+```
+
+### Value types
+
+| Form | Example | Resolved |
+| :-- | :-- | :-- |
+| Numeric | `translate-x-4` | `16px` |
+| Token | `translate-x-card` | `--spacing-card` value |
+| Fraction | `translate-x-1/2` | `50%` |
+| Arbitrary | `translate-x-[20px]` | `20` |
+| Negative | `-translate-x-4` | `-16` |
+
+## Rotate
+
+### 2D
+
+```
+rotate-{n}         → { rotate: 'Ndeg' }
+-rotate-{n}        → { rotate: '-Ndeg' }
+rotate-[0.25turn]  → { rotate: '0.25turn' }  (arbitrary, preserves unit)
+```
+
+### 3D
+
+```
+rotate-x-{n}   → { rotateX: 'Ndeg' }
+rotate-y-{n}   → { rotateY: 'Ndeg' }
+rotate-z-{n}   → { rotateZ: 'Ndeg' }
+```
+
+## Scale
+
+```
+scale-{n}      → { scale: n/100 }       e.g. scale-100 → 1.0, scale-110 → 1.1
+scale-x-{n}   → { scaleX: n/100 }
+scale-y-{n}   → { scaleY: n/100 }
+-scale-x-100   → { scaleX: -1 }         (mirror)
+scale-[1.2]    → { scale: 1.2 }         (arbitrary — no /100 division)
+```
+
+## Skew
+
+```
+skew-x-{n}    → { skewX: 'Ndeg' }
+skew-y-{n}    → { skewY: 'Ndeg' }
+```
+
+## Reset
+
+```
+transform-none  → transform: []
+```
+
+## Stacking multiple transforms
+
+```tsx
+<View className="translate-x-4 rotate-45 scale-110" />
+// transform: [{ translateX: 16 }, { rotate: '45deg' }, { scale: 1.1 }]
+```
+
+Order follows `className` string order, left to right.
+
+## Examples
+
+```tsx
+// Slide in from left
+<Animated.View className="translate-x-[-100%]" style={slideIn} />
+
+// Rotate icon
+<View className="rotate-90" />
+
+// Scale on press
+<Pressable className="active:scale-95">
+  <Text>Press me</Text>
+</Pressable>
+
+// 3D flip card
+<View className="rotate-y-180" />
+
+// Mirror image
+<Image className="-scale-x-100" source={arrowLeft} />
+
+// Combined
+<View className="translate-y-4 rotate-12 scale-75 opacity-50" />
+```

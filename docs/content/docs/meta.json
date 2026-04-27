@@ -1,0 +1,19 @@
+{
+  "title": "LunarCSS Documentation",
+  "pages": [
+    "---Getting Started---",
+    "...getting-started",
+    "---Configuration---",
+    "...configuration",
+    "---CLI---",
+    "...cli",
+    "---Utilities---",
+    "...utilities",
+    "---Integrations---",
+    "...integrations",
+    "---Roadmap---",
+    "...roadmap",
+    "---Known Limitations---",
+    "...known-limitations"
+  ]
+}

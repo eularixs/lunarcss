@@ -1,0 +1,15 @@
+{
+  "title": "Utilities",
+  "pages": [
+    "spacing",
+    "colors",
+    "layout",
+    "sizing",
+    "typography",
+    "borders",
+    "effects",
+    "transforms",
+    "containers",
+    "modifiers"
+  ]
+}

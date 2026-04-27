@@ -1,0 +1,100 @@
+---
+title: Spacing
+description: Padding, margin, gap, and inset utilities.
+---
+
+## Classes
+
+```
+p-{n}  px-{n}  py-{n}  pt-{n}  pr-{n}  pb-{n}  pl-{n}
+m-{n}  mx-{n}  my-{n}  mt-{n}  mr-{n}  mb-{n}  ml-{n}
+gap-{n}  gap-x-{n}  gap-y-{n}
+inset-{n}  top-{n}  right-{n}  bottom-{n}  left-{n}
+```
+
+## Value types
+
+| Form | Example | Resolved value |
+| :-- | :-- | :-- |
+| Numeric | `p-4` | `4 × 4px = 16px` (spacing base 4px) |
+| Named token | `p-card` | `--spacing-card` from `lunar.config.ts` |
+| Arbitrary | `p-[10px]` `p-[1rem]` | Literal value |
+| Fraction | `p-1/2` | `50%` |
+| Keyword | `p-auto` `p-full` `p-px` | `auto` / `100%` / `1px` |
+| Negative | `-mt-4` | `-16px` |
+
+## Spacing base
+
+The default spacing base is `4px`. Numeric classes multiply by this base:
+
+```
+p-1  →  4px
+p-2  →  8px
+p-4  →  16px
+p-8  →  32px
+p-16 →  64px
+```
+
+Override the base via `--spacing` in `theme.tokens`:
+
+```ts
+export default defineConfig({
+  theme: {
+    tokens: {
+      '--spacing': '8px', // doubles the scale
+    },
+  },
+})
+```
+
+## Named tokens
+
+```ts
+// lunar.config.ts
+export default defineConfig({
+  theme: {
+    extend: {
+      spacing: {
+        xs: '4px',
+        sm: '8px',
+        card: '24px',
+        section: '48px',
+      },
+    },
+  },
+})
+```
+
+Usage:
+
+```tsx
+<View className="p-card gap-xs mt-section" />
+```
+
+## Examples
+
+```tsx
+// uniform padding
+<View className="p-4" />
+
+// horizontal + vertical
+<View className="px-6 py-4" />
+
+// named token
+<View className="p-card" />
+
+// arbitrary
+<View className="pt-[42px]" />
+
+// negative margin
+<View className="-mt-2" />
+
+// gap in flex layout
+<View className="flex-row gap-4">
+  <View className="flex-1" />
+  <View className="flex-1" />
+</View>
+
+// absolute positioning
+<View className="absolute top-4 right-4" />
+```

@@ -1,9 +1,17 @@
 {
   "name": "lunarcss",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Plug-and-play Tailwind v4 styling engine for React Native and Web",
   "license": "MIT",
   "author": "Eularix Team",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eularix/lunarcss.git"
+  },
+  "homepage": "https://github.com/eularix/lunarcss#readme",
+  "bugs": {
+    "url": "https://github.com/eularix/lunarcss/issues"
+  },
   "type": "module",
   "sideEffects": false,
   "main": "./dist/index.js",
@@ -18,10 +26,6 @@
       "react-native": "./dist/index.js",
       "browser": "./dist/index.web.js",
       "default": "./dist/index.js"
-    },
-    "./babel-plugin": {
-      "types": "./dist/babel-plugin/index.d.ts",
-      "default": "./dist/babel-plugin/index.js"
     },
     "./metro": {
       "types": "./dist/metro/config.d.ts",
@@ -51,13 +55,19 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "lint": "tsc --noEmit"
   },
@@ -78,10 +88,14 @@
   },
   "peerDependencies": {
     "react": ">=18.0.0",
-    "react-native": ">=0.73.0"
+    "react-native": ">=0.73.0",
+    "postcss": ">=8.4.0"
   },
   "peerDependenciesMeta": {
     "react-native": {
+      "optional": true
+    },
+    "postcss": {
       "optional": true
     }
   },
@@ -95,10 +109,12 @@
     "@types/culori": "^2.1.0",
     "@types/node": "^22.0.0",
     "@types/react": "^18.3.0",
+    "postcss": "^8.4.0",
     "react": "^18.3.0",
     "react-native": "^0.76.0",
     "tsup": "^8.3.0",
     "typescript": "^5.6.0",
+    "@vitest/coverage-v8": "^2.1.0",
     "vitest": "^2.1.0"
   },
   "engines": {

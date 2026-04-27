@@ -43,6 +43,9 @@ export function modifiersMatch(modifiers: readonly string[], ctx: RuntimeContext
       if (ctx.width < min) return false
       continue
     }
+    // Container-query modifiers (`@sm:`, `@md:`, `@container/name:`, ...) are
+    // CSS-only — silently fail on RN without a warning (Risk #16).
+    if (m.startsWith('@')) return false
     // Unknown modifier: fail closed in dev, ignore in prod
     if (process.env.NODE_ENV !== 'production') {
       console.warn(`[LunarCSS] Unknown modifier "${m}"`)

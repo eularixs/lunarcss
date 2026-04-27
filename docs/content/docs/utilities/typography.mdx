@@ -1,0 +1,166 @@
+---
+title: Typography
+description: Font size, weight, family, line height, letter spacing, alignment, and text decoration.
+---
+
+## Font size
+
+### Named scale
+
+```
+text-xs     → 12px
+text-sm     → 14px
+text-base   → 16px
+text-lg     → 18px
+text-xl     → 20px
+text-2xl    → 24px
+text-3xl    → 30px
+text-4xl    → 36px
+text-5xl    → 48px
+text-6xl    → 60px
+text-7xl    → 72px
+text-8xl    → 96px
+text-9xl    → 128px
+```
+
+### Arbitrary
+
+```
+text-[18px]     → fontSize: 18
+text-[1.5rem]   → fontSize: 24 (at 16px base)
+```
+
+### Token
+
+```ts
+fontSize: { display: ['48px', '52px'] }
+```
+
+```tsx
+<Text className="text-display" />   // fontSize: 48, lineHeight: 52
+```
+
+## Font weight
+
+```
+font-thin         → fontWeight: '100'
+font-extralight   → fontWeight: '200'
+font-light        → fontWeight: '300'
+font-normal       → fontWeight: '400'
+font-medium       → fontWeight: '500'
+font-semibold     → fontWeight: '600'
+font-bold         → fontWeight: '700'
+font-extrabold    → fontWeight: '800'
+font-black        → fontWeight: '900'
+```
+
+## Font family
+
+Arbitrary form:
+
+```tsx
+<Text className="font-[Inter]" />      // fontFamily: 'Inter'
+<Text className="font-[SpaceMono]" />  // fontFamily: 'SpaceMono'
+```
+
+Token form (via `theme.extend.fontFamily`):
+
+```ts
+fontFamily: { sans: 'Inter', mono: 'SpaceMono' }
+```
+
+```tsx
+<Text className="font-sans" />
+```
+
+## Line height
+
+### Named multipliers (resolved against current `fontSize`)
+
+```
+leading-none      → 1.0  (× fontSize)
+leading-tight     → 1.25
+leading-snug      → 1.375
+leading-normal    → 1.5
+leading-relaxed   → 1.625
+leading-loose     → 2.0
+```
+
+Named `leading-*` classes are resolved **after** all classes in `className` are parsed. If `text-base leading-tight` is used together, the final `lineHeight` is `16 × 1.25 = 20`.
+
+### Numeric
+
+```
+leading-4   → 16px
+leading-6   → 24px
+leading-8   → 32px
+```
+
+### Arbitrary
+
+```
+leading-[20px]   → lineHeight: 20
+```
+
+## Letter spacing
+
+```
+tracking-tighter  → letterSpacing: -0.8px   (−0.05em × 16)
+tracking-tight    → letterSpacing: -0.4px
+tracking-normal   → letterSpacing: 0
+tracking-wide     → letterSpacing: 0.4px
+tracking-wider    → letterSpacing: 0.8px
+tracking-widest   → letterSpacing: 1.6px
+tracking-[2px]    → letterSpacing: 2
+```
+
+Letter spacing values are computed as `em × 16px` base on mobile.
+
+## Text alignment
+
+```
+text-left     → textAlign: 'left'
+text-center   → textAlign: 'center'
+text-right    → textAlign: 'right'
+text-justify  → textAlign: 'justify'
+```
+
+## Font style
+
+```
+italic      → fontStyle: 'italic'
+not-italic  → fontStyle: 'normal'
+```
+
+## Text decoration
+
+```
+underline      → textDecorationLine: 'underline'
+line-through   → textDecorationLine: 'line-through'
+no-underline   → textDecorationLine: 'none'
+```
+
+## Text transform
+
+```
+uppercase    → textTransform: 'uppercase'
+lowercase    → textTransform: 'lowercase'
+capitalize   → textTransform: 'capitalize'
+normal-case  → textTransform: 'none'
+```
+
+## Examples
+
+```tsx
+// Heading
+<Text className="text-4xl font-bold tracking-tight text-white leading-tight" />
+
+// Body copy
+<Text className="text-base font-normal leading-relaxed text-zinc-400" />
+
+// Token-based display text
+<Text className="text-display font-bold text-primary" />
+
+// Caption
+<Text className="text-sm font-medium uppercase tracking-wider text-muted" />
+```

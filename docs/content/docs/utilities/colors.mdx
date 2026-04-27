@@ -1,0 +1,104 @@
+---
+title: Colors
+description: Background, text, border, ring, shadow, tint, and placeholder color utilities.
+---
+
+## Classes
+
+```
+bg-{value}
+text-{value}
+border-{value}
+ring-{value}
+shadow-{value}
+tint-{value}
+placeholder-{value}
+```
+
+## Value types
+
+| Form | Example | Notes |
+| :-- | :-- | :-- |
+| Named token | `bg-primary` | Reads `--color-primary` |
+| CSS keyword | `bg-black` `bg-white` `bg-transparent` | |
+| Arbitrary hex | `bg-[#6366f1]` | |
+| Arbitrary OKLCH | `bg-[oklch(0.6_0.2_264)]` | Mobile: auto-converted to sRGB |
+| Opacity modifier | `bg-primary/50` | `50%` opacity |
+
+## Opacity modifier
+
+Append `/N` (0–100) or `/[value]` to any color class to set opacity:
+
+```tsx
+<View className="bg-primary/50" />       // 50% opacity
+<View className="bg-black/20" />         // 20% opacity
+<View className="bg-[#6366f1]/75" />     // arbitrary color + opacity
+```
+
+On mobile, opacity is applied via `rgba()`. On web, via CSS `color-mix()` or `opacity` (handled by Tailwind v4 engine).
+
+## Named tokens
+
+```ts
+// lunar.config.ts
+export default defineConfig({
+  theme: {
+    extend: {
+      colors: {
+        primary: '#6366f1',
+        accent: '#f59e0b',
+        surface: '#18181b',
+        muted: 'oklch(0.6 0.02 264)',
+      },
+    },
+  },
+})
+```
+
+Usage:
+
+```tsx
+<View className="bg-surface">
+  <Text className="text-primary">Hello</Text>
+  <Text className="text-muted">Subtitle</Text>
+</View>
+```
+
+## OKLCH on mobile
+
+LunarCSS converts OKLCH to the nearest sRGB hex via `culori` before passing it to React Native's `StyleSheet`:
+
+```ts
+colors: {
+  brand: 'oklch(0.6 0.2 264)', // → ~#6366f1 on mobile
+}
+```
+
+Out-of-gamut values are clamped and emit a dev warning:
+
+```
+[LunarCSS] OKLCH value oklch(0.8 0.35 264) is out of sRGB gamut — clamped to #a78bfa
+```
+
+Use sRGB-safe OKLCH or a hex fallback if you need exact mobile colors.
+
+## Examples
+
+```tsx
+// Background color
+<View className="bg-zinc-900" />
+<View className="bg-primary" />
+<View className="bg-[#1e1e2e]" />
+
+// Text color
+<Text className="text-white" />
+<Text className="text-primary" />
+<Text className="text-[oklch(0.8_0.1_264)]" />
+
+// Border color
+<View className="border border-primary/30" />
+
+// Conditional colors with modifiers
+<View className="bg-white dark:bg-zinc-900" />
+<Text className="text-zinc-900 dark:text-white" />
+```

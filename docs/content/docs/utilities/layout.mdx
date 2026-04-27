@@ -1,0 +1,118 @@
+---
+title: Layout
+description: Flex, position, overflow, and z-index utilities.
+---
+
+## Display
+
+```
+flex         → display: flex
+hidden       → display: none
+```
+
+## Flex direction
+
+```
+flex-row            → flexDirection: 'row'
+flex-col            → flexDirection: 'column'
+flex-row-reverse    → flexDirection: 'row-reverse'
+flex-col-reverse    → flexDirection: 'column-reverse'
+```
+
+## Flex wrap
+
+```
+flex-wrap         → flexWrap: 'wrap'
+flex-nowrap       → flexWrap: 'nowrap'
+flex-wrap-reverse → flexWrap: 'wrap-reverse'
+```
+
+## Flex sizing
+
+```
+flex-1       → flex: 1
+flex-auto    → flex: 1 1 auto   (web) / flex: 1 (native)
+flex-initial → flex: 0 1 auto
+flex-none    → flex: none / 0
+flex-grow    → flexGrow: 1
+flex-grow-0  → flexGrow: 0
+flex-shrink  → flexShrink: 1
+flex-shrink-0→ flexShrink: 0
+grow         → flexGrow: 1
+shrink       → flexShrink: 1
+flex-{n}     → flex: n  (numeric, e.g. flex-2)
+```
+
+## Alignment
+
+### `items-*` (alignItems)
+
+```
+items-start    items-end    items-center    items-baseline    items-stretch
+```
+
+### `justify-*` (justifyContent)
+
+```
+justify-start  justify-end  justify-center  justify-between  justify-around  justify-evenly
+```
+
+### `self-*` (alignSelf)
+
+```
+self-auto  self-start  self-end  self-center  self-stretch  self-baseline
+```
+
+### `content-*` (alignContent)
+
+```
+content-start  content-end  content-center  content-between  content-around  content-stretch
+```
+
+## Position
+
+```
+absolute   → position: 'absolute'
+relative   → position: 'relative'
+static     → position: 'relative'  (RN has no 'static', maps to 'relative')
+```
+
+## Overflow
+
+```
+overflow-hidden   → overflow: 'hidden'
+overflow-visible  → overflow: 'visible'
+overflow-scroll   → overflow: 'scroll'
+```
+
+## Z-index
+
+```
+z-{n}   → zIndex: n   (e.g. z-10, z-50)
+```
+
+## Examples
+
+```tsx
+// Centered full-screen layout
+<View className="flex-1 items-center justify-center bg-zinc-900">
+  <Text className="text-white">Centered</Text>
+</View>
+
+// Horizontal row with gap
+<View className="flex-row items-center gap-4 px-6">
+  <Image className="w-10 h-10 rounded-full" />
+  <Text className="flex-1 text-white">Title</Text>
+  <View className="z-10 absolute top-0 right-0" />
+</View>
+
+// Scrollable content
+<ScrollView className="flex-1 overflow-scroll">
+  {/* ... */}
+</ScrollView>
+
+// Dark mode aware card
+<View className="bg-white dark:bg-zinc-800 rounded-card p-card">
+  <Text className="text-zinc-900 dark:text-white">Card</Text>
+</View>
+```

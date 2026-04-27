@@ -1,0 +1,50 @@
+---
+title: Escape Hatch — Flat Tokens
+description: Inject raw CSS variables directly, bypassing the namespace map.
+---
+
+## `theme.tokens`
+
+When you need a CSS variable that doesn't fit any namespace (e.g. a shadow composite, a custom property for a third-party library, or a one-off value), use the flat `tokens` escape hatch:
+
+```ts
+import { defineConfig } from 'lunarcss'
+
+export default defineConfig({
+  theme: {
+    tokens: {
+      '--color-primary': '#6366f1',
+      '--my-card-shadow': '0 4px 24px rgba(0,0,0,0.12)',
+      '--animation-duration': '200ms',
+    },
+  },
+})
+```
+
+## Flat tokens vs namespace tokens
+
+`theme.tokens` keys are emitted verbatim — no prefix transformation is applied. When both `theme.extend` and `theme.tokens` define the same CSS variable, **`theme.tokens` wins** (flat overrides last):
+
+```ts
+export default defineConfig({
+  theme: {
+    extend: {
+      colors: { primary: '#6366f1' }, // emits --color-primary: #6366f1
+    },
+    tokens: {
+      '--color-primary': '#4f46e5', // overrides → --color-primary: #4f46e5
+    },
+  },
+})
+```
+
+## When to use flat tokens
+
+- CSS variables consumed by third-party components (e.g. a chart library expecting `--chart-color-1`)
+- Composite values like `box-shadow` or `filter` that the namespace map doesn't cover
+- Overriding a Tailwind v4 built-in variable (e.g. `--color-blue-500`) without adding it to `theme.extend`
+- Gradual migration from a hand-rolled CSS variable system
+
+## What's emitted
+
+Both `theme.extend` and `theme.tokens` values end up in the same `@theme {}` block on web and in the same `__theme__.js` virtual module on mobile. Flat tokens have no effect on class name resolution beyond making the variable available at the right CSS variable name.

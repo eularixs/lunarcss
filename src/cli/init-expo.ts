@@ -1,23 +1,18 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import {
-  appendSection,
-  writeFileChanged,
-  writeFileIfMissing,
-  type WriteResult,
-} from './util-fs.js'
+import { writeFileChanged, writeFileIfMissing } from './util-fs.js'
 import { mergeMetroConfig } from './merge-metro-config.js'
-import { LUNAR_CONFIG_TEMPLATE } from './templates/lunar-config.ts.tmpl.js'
 import { METRO_CONFIG_EXPO_DEFAULT } from './templates/metro-config.expo.ts.tmpl.js'
+import {
+  ensureGitignore,
+  ensureLunarConfig,
+  ensureTsconfigTypes,
+  type InitStep,
+} from './init-shared.js'
 
 export interface InitExpoOptions {
   projectRoot: string
   dryRun?: boolean
-}
-
-export interface InitStep {
-  label: string
-  result: WriteResult
 }
 
 export interface InitExpoReport {
@@ -25,52 +20,14 @@ export interface InitExpoReport {
   warnings: string[]
 }
 
-const GITIGNORE_HEADER = '# LunarCSS'
-const GITIGNORE_BODY = '.lunarcss/\n'
-
-function patchTsconfigTypes(projectRoot: string, dryRun: boolean): WriteResult | null {
-  const path = join(projectRoot, 'tsconfig.json')
-  if (!existsSync(path)) return null
-  const raw = readFileSync(path, 'utf8')
-  let json: { compilerOptions?: { types?: string[] } } & Record<string, unknown>
-  try {
-    json = JSON.parse(raw)
-  } catch {
-    return { path, status: 'unchanged' }
-  }
-
-  const types = json.compilerOptions?.types ?? []
-  if (types.includes('lunarcss/types')) {
-    return { path, status: 'unchanged' }
-  }
-
-  json.compilerOptions = {
-    ...(json.compilerOptions ?? {}),
-    types: [...types, 'lunarcss/types'],
-  }
-  const next = `${JSON.stringify(json, null, 2)}\n`
-  if (dryRun) return { path, status: 'updated' }
-  return writeFileChanged(path, next)
-}
-
 export function runInitExpo(options: InitExpoOptions): InitExpoReport {
   const { projectRoot, dryRun = false } = options
   const steps: InitStep[] = []
   const warnings: string[] = []
 
-  // 1. lunar.config.ts (skip if present — never overwrite user config)
-  const lunarConfigPath = join(projectRoot, 'lunar.config.ts')
-  steps.push({
-    label: 'lunar.config.ts',
-    result: dryRun
-      ? {
-          path: lunarConfigPath,
-          status: existsSync(lunarConfigPath) ? 'skipped-existing' : 'created',
-        }
-      : writeFileIfMissing(lunarConfigPath, LUNAR_CONFIG_TEMPLATE),
-  })
+  steps.push(ensureLunarConfig(projectRoot, dryRun))
 
-  // 2. metro.config.js — create-or-merge
+  // metro.config.js — create-or-merge
   const metroJsPath = join(projectRoot, 'metro.config.js')
   if (existsSync(metroJsPath)) {
     const prev = readFileSync(metroJsPath, 'utf8')
@@ -80,15 +37,9 @@ export function runInitExpo(options: InitExpoOptions): InitExpoReport {
         'metro.config.js exists but has no top-level `module.exports = ...` we could wrap. ' +
           'Manually wrap your config with `withLunarCSS(...)` from `lunarcss/metro`.',
       )
-      steps.push({
-        label: 'metro.config.js',
-        result: { path: metroJsPath, status: 'unchanged' },
-      })
+      steps.push({ label: 'metro.config.js', result: { path: metroJsPath, status: 'unchanged' } })
     } else if (!merge.changed) {
-      steps.push({
-        label: 'metro.config.js',
-        result: { path: metroJsPath, status: 'unchanged' },
-      })
+      steps.push({ label: 'metro.config.js', result: { path: metroJsPath, status: 'unchanged' } })
     } else {
       steps.push({
         label: 'metro.config.js',
@@ -106,30 +57,10 @@ export function runInitExpo(options: InitExpoOptions): InitExpoReport {
     })
   }
 
-  // 3. .gitignore append
-  const gitignorePath = join(projectRoot, '.gitignore')
-  if (dryRun) {
-    const exists = existsSync(gitignorePath)
-    const already = exists && readFileSync(gitignorePath, 'utf8').includes(GITIGNORE_HEADER)
-    steps.push({
-      label: '.gitignore',
-      result: {
-        path: gitignorePath,
-        status: already ? 'unchanged' : exists ? 'updated' : 'created',
-      },
-    })
-  } else {
-    steps.push({
-      label: '.gitignore',
-      result: appendSection(gitignorePath, GITIGNORE_HEADER, GITIGNORE_BODY),
-    })
-  }
+  steps.push(ensureGitignore(projectRoot, dryRun))
 
-  // 4. tsconfig.json types augmentation (best-effort, optional)
-  const tsResult = patchTsconfigTypes(projectRoot, dryRun)
-  if (tsResult) {
-    steps.push({ label: 'tsconfig.json', result: tsResult })
-  }
+  const ts = ensureTsconfigTypes(projectRoot, dryRun)
+  if (ts) steps.push(ts)
 
   return { steps, warnings }
 }

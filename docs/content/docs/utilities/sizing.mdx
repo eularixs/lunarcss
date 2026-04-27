@@ -1,0 +1,88 @@
+---
+title: Sizing
+description: Width, height, min/max sizing, and the size shorthand.
+---
+
+## Classes
+
+```
+w-{n}     h-{n}
+min-w-{n} max-w-{n}
+min-h-{n} max-h-{n}
+size-{n}           ← sets both width and height
+```
+
+## Value types
+
+| Form | Example | Resolved |
+| :-- | :-- | :-- |
+| Numeric | `w-16` | `16 × 4px = 64px` |
+| Fraction | `w-1/2` | `50%` |
+| Keyword `full` | `w-full` | `100%` |
+| Keyword `auto` | `w-auto` | `auto` (or `undefined` on RN where unsupported) |
+| Keyword `screen` | `w-screen` | `Dimensions.get('window').width` on native / `100vw` on web |
+| Keyword `px` | `w-px` | `1px` |
+| Arbitrary | `w-[320px]` | `320px` |
+| Named token | `w-card` | `--width-card` → fallback `--spacing-card` |
+
+## Named tokens
+
+```ts
+// lunar.config.ts
+export default defineConfig({
+  theme: {
+    extend: {
+      width: {
+        card: '320px',
+        sidebar: '240px',
+      },
+      maxWidth: {
+        content: '768px',
+      },
+    },
+  },
+})
+```
+
+Usage:
+
+```tsx
+<View className="w-card max-w-content" />
+```
+
+## Token fallback chain
+
+For `w-{name}`, LunarCSS checks in order:
+1. `--width-{name}` (from `theme.extend.width`)
+2. `--spacing-{name}` (from `theme.extend.spacing`)
+
+This means a `spacing.card` token is usable as `w-card` without explicitly adding it to `width`.
+
+## `size-{n}` shorthand
+
+Sets both `width` and `height` to the same value:
+
+```tsx
+<View className="size-10" />     // width: 40, height: 40
+<View className="size-full" />   // width: '100%', height: '100%'
+<View className="size-[48px]" /> // width: 48, height: 48
+```
+
+## Examples
+
+```tsx
+// Full screen container
+<View className="w-full h-full" />
+
+// Fixed card width
+<View className="w-card min-h-[200px]" />
+
+// Flexible content area with max width
+<View className="w-full max-w-content mx-auto" />
+
+// Square avatar
+<View className="size-10 rounded-full overflow-hidden" />
+
+// Responsive: full width on mobile, fixed on md+
+<View className="w-full md:w-card" />
+```

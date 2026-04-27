@@ -1,0 +1,123 @@
+---
+title: lunarcss init
+description: Auto-detect your project type and configure everything in one command.
+---
+
+## Usage
+
+```bash
+npx lunarcss init           # detect + configure
+npx lunarcss init --dry-run # preview without writing
+npx lunarcss --version
+npx lunarcss --help
+```
+
+## Project detection
+
+The CLI reads `package.json` in the current directory and chooses a runner:
+
+| Condition | Runner |
+| :-- | :-- |
+| `dependencies.expo` present | Expo |
+| `dependencies.next` present | Next.js |
+| `dependencies.react-native` present (no expo, no next) | RN Bare |
+| None of the above | Error — exits |
+
+Expo wins when both `expo` and `react-native` are present.
+
+**Expo SDK warning**: if `expo` version is `< 50`, the CLI prints a warning recommending an upgrade. LunarCSS works best with SDK 50+.
+
+## What each runner generates
+
+### Expo
+
+```
+lunar.config.ts        created — token source of truth
+metro.config.js        created or AST-merged
+.gitignore             updated — .lunarcss/ ignored
+tsconfig.json          updated — types: ["lunarcss/types"]
+```
+
+Default `metro.config.js`:
+
+```js
+const { getDefaultConfig } = require('expo/metro-config')
+const { withLunarCSS } = require('lunarcss/metro')
+
+const config = getDefaultConfig(__dirname)
+module.exports = withLunarCSS(config)
+```
+
+### Next.js
+
+```
+lunar.config.ts        created
+app/globals.css        created or patched
+.gitignore             updated
+tsconfig.json          updated
+```
+
+`app/globals.css` (created or block prepended):
+
+```css
+/* LunarCSS */
+@import "tailwindcss";
+@plugin "lunarcss";
+```
+
+The CLI searches 8 candidate paths for an existing globals CSS file before creating a new one.
+
+### RN Bare
+
+Same as Expo but uses `@react-native/metro-config` + `mergeConfig`:
+
+```js
+const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config')
+const { withLunarCSS } = require('lunarcss/metro')
+
+const config = {}
+module.exports = withLunarCSS(mergeConfig(getDefaultConfig(__dirname), config))
+```
+
+## Default `lunar.config.ts`
+
+All runners generate the same starter config:
+
+```ts
+import { defineConfig } from 'lunarcss'
+
+export default defineConfig({
+  theme: {
+    extend: {
+      colors: {
+        primary: 'oklch(0.6 0.2 264)',
+        accent: '#f59e0b',
+      },
+      spacing: {
+        xs: '4px',
+        card: '24px',
+      },
+      borderRadius: {
+        card: '14px',
+      },
+    },
+  },
+})
+```
+
+## `--dry-run`
+
+Preview what the CLI would write without touching any files:
+
+```bash
+npx lunarcss init --dry-run
+```
+
+Output shows each file with its planned action:
+
+```
+[+] lunar.config.ts       (would create)
+[~] metro.config.js       (would merge)
+[=] .gitignore            (already up to date)
+[~] tsconfig.json         (would update)
+```

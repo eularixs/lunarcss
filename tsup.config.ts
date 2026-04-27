@@ -4,7 +4,6 @@ export default defineConfig({
   entry: {
     index: 'src/index.ts',
     'index.web': 'src/index.web.ts',
-    'babel-plugin/index': 'src/babel-plugin/index.ts',
     'metro/config': 'src/metro/config.ts',
     'metro/transformer': 'src/metro/transformer.ts',
     'web/plugin': 'src/web/plugin.ts',
@@ -31,5 +30,6 @@ export default defineConfig({
     '@babel/generator',
     '@babel/traverse',
     '@babel/types',
+    'postcss',
   ],
 })

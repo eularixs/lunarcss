@@ -1,0 +1,118 @@
+---
+title: PostCSS Web Plugin
+description: Reads lunar.config.ts at build time and emits @theme {} for Tailwind v4.
+---
+
+## Overview
+
+The `lunarcss` PostCSS plugin reads `lunar.config.ts` via `jiti` and emits an `@theme { ... }` block directly before `@import "tailwindcss"`. This makes your custom tokens available as Tailwind CSS variables at compile time.
+
+## Setup
+
+```js
+// postcss.config.js
+module.exports = {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    lunarcss: {},
+  },
+}
+```
+
+Your entry CSS file:
+
+```css
+/* app/globals.css */
+@import "tailwindcss";
+@plugin "lunarcss";
+```
+
+## Options
+
+```js
+const lunarcss = require('lunarcss/web/plugin')
+
+module.exports = {
+  plugins: [
+    require('@tailwindcss/postcss'),
+    lunarcss({
+      configFile: '/abs/path/to/lunar.config.ts',  // override discovery
+      projectRoot: process.cwd(),                   // override cwd
+      passthrough: false,                           // run but emit nothing (debug)
+    }),
+  ],
+}
+```
+
+## What gets emitted
+
+Input:
+
+```css
+/* LunarCSS */
+@import "tailwindcss";
+@plugin "lunarcss";
+```
+
+Output (with `colors.primary = '#6366f1'`, `spacing.xs = '4px'`):
+
+```css
+/* LunarCSS */
+/* lunarcss:emitted */
+@theme {
+  --color-primary: #6366f1;
+  --spacing-xs: 4px
+}
+@import "tailwindcss";
+@plugin "lunarcss";
+```
+
+Tokens are sorted alphabetically. The `/* lunarcss:emitted */` marker prevents double injection on re-runs.
+
+## Injection target
+
+- If `@import "tailwindcss"` is found → `@theme {}` is inserted directly before it
+- If only `@plugin "lunarcss"` is found → `@theme {}` is prepended to the root
+- If neither is found → plugin skips the file entirely (avoids polluting unrelated stylesheets)
+
+## Hot-reload
+
+The plugin pushes a `type: 'dependency'` PostCSS message pointing at `lunar.config.ts`. Next.js, Vite, and Webpack honor this — editing `lunar.config.ts` automatically re-runs PostCSS on dependent CSS files.
+
+`jiti` runs with `moduleCache: false` and `fsCache: false` — no stale config across reads.
+
+## Idempotency
+
+Re-running PostCSS on already-emitted output is a no-op — the `/* lunarcss:emitted */` marker short-circuits injection.
+
+## Next.js example
+
+```bash
+npx lunarcss init   # generates globals.css + updates postcss.config.js
+```
+
+Or manually:
+
+1. `app/globals.css`:
+
+```css
+@import "tailwindcss";
+@plugin "lunarcss";
+```
+
+2. `app/layout.tsx`:
+
+```tsx
+import './globals.css'
+```
+
+3. `postcss.config.js`:
+
+```js
+module.exports = {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    lunarcss: {},
+  },
+}
+```

@@ -1,0 +1,72 @@
+name: Publish Beta
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  publish-beta:
+    name: Publish beta to npm
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.message, 'release: beta')
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test with coverage
+        run: pnpm test:coverage
+
+      - name: Build
+        run: pnpm build
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Bump prerelease version
+        id: bump
+        run: |
+          CURRENT=$(node -p "require('./package.json').version")
+          if echo "${CURRENT}" | grep -qE '\-beta\.[0-9]+$'; then
+            npm version prerelease --preid=beta --no-git-tag-version
+          else
+            npm version preminor --preid=beta --no-git-tag-version
+          fi
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          echo "new_version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and tag
+        env:
+          NEW_VERSION: ${{ steps.bump.outputs.new_version }}
+        run: |
+          git add package.json
+          git commit -m "chore: release v${NEW_VERSION}"
+          git tag "v${NEW_VERSION}"
+          git push origin dev --follow-tags
+
+      - name: Publish beta to npm
+        run: npm publish --tag beta --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

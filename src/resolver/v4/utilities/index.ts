@@ -6,6 +6,8 @@ import { resolveSizing } from './sizing.js'
 import { resolveTypography } from './typography.js'
 import { resolveBorders } from './borders.js'
 import { resolveEffects } from './effects.js'
+import { resolveTransforms } from './transforms.js'
+import { resolveContainers } from './containers.js'
 
 type UtilityResolver = (className: string) => ResolveResult | null
 
@@ -13,8 +15,10 @@ type UtilityResolver = (className: string) => ResolveResult | null
 // (also static-heavy). Effects + borders before colors so `shadow-md` /
 // `border-2` win over color resolver's `shadow-{color}` / `border-{color}`.
 const RESOLVERS: readonly UtilityResolver[] = [
+  resolveContainers,
   resolveLayout,
   resolveTypography,
+  resolveTransforms,
   resolveEffects,
   resolveBorders,
   resolveColor,

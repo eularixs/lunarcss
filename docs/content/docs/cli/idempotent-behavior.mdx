@@ -1,0 +1,49 @@
+---
+title: Idempotent Behavior
+description: Running lunarcss init twice is always safe — it never overwrites your edits.
+---
+
+## Re-run safety
+
+`lunarcss init` can be run on a project that already has LunarCSS configured. Each file has its own strategy to detect an existing setup and skip or merge safely.
+
+## Status legend
+
+| Symbol | Meaning |
+| :-- | :-- |
+| `[+]` | Created (new file) |
+| `[~]` | Updated (merged/patched) |
+| `[=]` | Unchanged (already up to date) |
+| `[s]` | Skipped — existing user file, never overwritten |
+
+## Per-file behavior
+
+| File | First run | Re-run |
+| :-- | :-- | :-- |
+| `lunar.config.ts` | `[+] created` | `[s] skipped` — never overwrites user edits |
+| `metro.config.js` | `[+] created` or `[~] merged` | `[=] unchanged` (substring match) |
+| `app/globals.css` | `[+] created` or `[~] merged` | `[=] unchanged` (marker comment match) |
+| `.gitignore` | `[+] created` or `[~] updated` | `[=] unchanged` (header sentinel `# LunarCSS`) |
+| `tsconfig.json` | `[~] updated` (types appended) | `[=] unchanged` |
+
+## Detection logic
+
+### `lunar.config.ts`
+
+Checked by file existence. If `lunar.config.ts` (or any of its variants) already exists at the project root, the CLI skips it entirely. Your token customizations are never touched.
+
+### `metro.config.js`
+
+Checked via substring: if the file already contains `'lunarcss/metro'`, the CLI skips it. Otherwise it performs an [AST merge](/docs/cli/ast-merge).
+
+### `app/globals.css`
+
+Checked for the `/* LunarCSS */` marker comment. If found, the file is skipped. Otherwise the LunarCSS block is prepended.
+
+### `.gitignore`
+
+Checked for the `# LunarCSS` sentinel header. If the `.lunarcss/` entry is already present, no changes are made.
+
+### `tsconfig.json`
+
+Checks whether `"lunarcss/types"` is already in `compilerOptions.types`. If present, skipped.

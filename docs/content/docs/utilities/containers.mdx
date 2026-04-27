@@ -1,0 +1,63 @@
+---
+title: Containers
+description: Container query classes — active on web, silent no-op on mobile.
+---
+
+## Mobile behavior
+
+Container query classes are **not supported by React Native**. On mobile, LunarCSS silently consumes them with no style output and no warning:
+
+```tsx
+// On mobile: these produce {} — no crash, no warn
+<View className="@container" />
+<View className="@sm:flex-row" />
+<View className="@container/sidebar" />
+```
+
+This allows you to keep a single `className` string that works on both platforms.
+
+## Web behavior
+
+On web, the `className` prop passes through as-is to the DOM — Tailwind's CSS engine resolves all container query classes normally.
+
+## Container declaration classes
+
+```
+@container             → declare a container context
+@container-normal      → revert to normal sizing context
+@container-size        → size-based container context
+@container/{name}      → named container context
+```
+
+## Container query modifier prefix
+
+```
+@sm:          → container query breakpoint sm
+@md:          → container query breakpoint md
+@lg:          → container query breakpoint lg
+@container/sidebar:  → named container query
+```
+
+All `@*:` modifiers are silently skipped on mobile.
+
+## Example (universal component)
+
+```tsx
+export function Card({ children }: { children: React.ReactNode }) {
+  return (
+    <View className="@container rounded-card p-card bg-zinc-900">
+      <View className="flex-col @md:flex-row gap-4">
+        {children}
+      </View>
+    </View>
+  )
+}
+```
+
+On **mobile**: `@container` → no-op, `@md:flex-row` → skipped, layout stays `flex-col`.
+
+On **web**: container query fires when the card reaches `md` width, layout switches to `flex-row`.
+
+## Why no warning on mobile?
+
+Container queries are a valid, expected web pattern in universal components. Warning on every `@container` class would produce noise for any cross-platform codebase. Silently dropping is the correct behavior — analogous to how `display: grid` silently doesn't apply on native.
