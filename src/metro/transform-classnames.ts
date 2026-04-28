@@ -3,9 +3,25 @@
 // Implementation pending; this stub keeps the package entry stable.
 
 import { parse } from '@babel/parser'
-import generate from '@babel/generator'
-import traverse from '@babel/traverse'
+import generateImport from '@babel/generator'
+import traverseImport from '@babel/traverse'
 import * as t from '@babel/types'
+
+// @babel/traverse and @babel/generator are CJS modules that historically used
+// `module.exports = fn` plus `module.exports.default = fn`. Under Node's
+// ESM->CJS interop the imported binding may resolve to the namespace object
+// `{ default: fn }` instead of the function itself, depending on Node version
+// and bundler. Normalize once at module load.
+type TraverseFn = typeof traverseImport
+type GenerateFn = typeof generateImport
+const traverse: TraverseFn =
+  typeof traverseImport === 'function'
+    ? traverseImport
+    : ((traverseImport as unknown as { default: TraverseFn }).default)
+const generate: GenerateFn =
+  typeof generateImport === 'function'
+    ? generateImport
+    : ((generateImport as unknown as { default: GenerateFn }).default)
 
 export interface TransformInput {
   src: string

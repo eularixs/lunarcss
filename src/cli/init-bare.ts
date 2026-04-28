@@ -7,8 +7,17 @@ import {
   ensureGitignore,
   ensureLunarConfig,
   ensureTsconfigTypes,
+  ensureTypesReference,
   type InitStep,
 } from './init-shared.js'
+
+const BARE_ENTRY_CANDIDATES = [
+  'index.ts',
+  'index.tsx',
+  'index.js',
+  'App.tsx',
+  'App.ts',
+] as const
 
 export interface InitBareOptions {
   projectRoot: string
@@ -58,7 +67,12 @@ export function runInitBare(options: InitBareOptions): InitBareReport {
 
   steps.push(ensureGitignore(projectRoot, dryRun))
   const ts = ensureTsconfigTypes(projectRoot, dryRun)
-  if (ts) steps.push(ts)
+  if (ts) {
+    steps.push(ts)
+  } else {
+    const ref = ensureTypesReference(projectRoot, dryRun, BARE_ENTRY_CANDIDATES)
+    if (ref) steps.push(ref)
+  }
 
   return { steps, warnings }
 }

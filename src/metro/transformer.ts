@@ -47,12 +47,27 @@ function loadUpstream(): UpstreamTransformer {
 export function transform(input: MetroTransformInput): unknown {
   const upstream = loadUpstream()
 
-  if (!TRANSFORMABLE_EXT.test(input.filename)) {
+  if (!shouldTransform(input.filename, input.src)) {
     return upstream.transform(input)
   }
 
   const { code } = transformClassNames({ src: input.src, filename: input.filename })
   return upstream.transform({ ...input, src: code })
+}
+
+function shouldTransform(filename: string, src: string): boolean {
+  // Skip non-JS/TS files.
+  if (!TRANSFORMABLE_EXT.test(filename)) return false
+  // Skip files inside node_modules — they cannot contain user-authored
+  // className strings we care about, and parsing third-party TS (e.g.
+  // expo-modules-core's declaration files) with our minimal plugin set
+  // ('jsx', 'typescript') breaks on syntax we don't enable (decorators,
+  // etc.) and would crash bundling.
+  if (filename.includes('/node_modules/')) return false
+  // Cheap source-level guard: no `className` token → nothing to rewrite.
+  // Avoids parsing the entire app on every change.
+  if (!src.includes('className')) return false
+  return true
 }
 
 export { transformClassNames } from './transform-classnames.js'

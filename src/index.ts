@@ -1,12 +1,7 @@
-// Native / default entry. Auto-init the RN bridge + load tokens emitted by
-// `withLunarCSS()` from the user's `lunar.config.ts`.
-import { initNativeBridge } from './runtime/native-bridge.js'
-import { setTokens } from './runtime/tokens.js'
-import { THEME_TOKENS } from 'lunarcss/__theme__'
-
-initNativeBridge()
-setTokens(THEME_TOKENS as Record<string, string>)
-
+// Native / default entry. Re-exports the public API. Boot-time hydration
+// (initNativeBridge + setTokens(THEME_TOKENS)) lives in ./runtime/tw.ts so
+// transformer-injected `import { __lcssTw } from 'lunarcss/runtime'` triggers
+// it on its own — user apps don't need to import the root entry.
 export { __lcssTw, tw } from './runtime/tw.js'
 export { updateTheme, subscribeTheme } from './runtime/theme.js'
 export { setTokens, clearTokens, getToken, getAllTokens } from './runtime/tokens.js'

@@ -66,14 +66,22 @@ export function ensureTsconfigTypes(
     return { label: 'tsconfig.json', result: { path, status: 'unchanged' } }
   }
 
-  const types = json.compilerOptions?.types ?? []
-  if (types.includes('lunarcss/types')) {
+  const existingTypes = json.compilerOptions?.types
+  // Only mutate `types` when the user already opts into an explicit array.
+  // Adding a fresh `types` field narrows TS ambient type discovery and hides
+  // @types/node, @types/react, etc. — which silently breaks Expo/RN projects.
+  // For projects without an explicit `types`, we wire augmentation via a
+  // triple-slash reference in the entry file instead (see ensureTypesReference).
+  if (!existingTypes) {
+    return null
+  }
+  if (existingTypes.includes('lunarcss/types')) {
     return { label: 'tsconfig.json', result: { path, status: 'unchanged' } }
   }
 
   json.compilerOptions = {
     ...(json.compilerOptions ?? {}),
-    types: [...types, 'lunarcss/types'],
+    types: [...existingTypes, 'lunarcss/types'],
   }
   const next = `${JSON.stringify(json, null, 2)}\n`
   return {
@@ -82,4 +90,44 @@ export function ensureTsconfigTypes(
       ? { path, status: 'updated' }
       : writeFileChanged(path, next),
   }
+}
+
+const TYPES_REFERENCE = '/// <reference types="lunarcss/types" />\n'
+
+// Insert a triple-slash reference to lunarcss/types in the project's entry
+// file when tsconfig.json doesn't have an explicit `types` array. Idempotent.
+export function ensureTypesReference(
+  projectRoot: string,
+  dryRun: boolean,
+  candidates: readonly string[],
+): InitStep | null {
+  const tsconfig = join(projectRoot, 'tsconfig.json')
+  if (existsSync(tsconfig)) {
+    try {
+      const json = JSON.parse(readFileSync(tsconfig, 'utf8')) as {
+        compilerOptions?: { types?: string[] }
+      }
+      // tsconfig route already covers it.
+      if (json.compilerOptions?.types) return null
+    } catch {
+      // fall through — write the reference defensively.
+    }
+  }
+
+  for (const rel of candidates) {
+    const full = join(projectRoot, rel)
+    if (!existsSync(full)) continue
+    const prev = readFileSync(full, 'utf8')
+    if (prev.includes('lunarcss/types')) {
+      return { label: rel, result: { path: full, status: 'unchanged' } }
+    }
+    const next = `${TYPES_REFERENCE}${prev}`
+    return {
+      label: rel,
+      result: dryRun
+        ? { path: full, status: 'updated' }
+        : writeFileChanged(full, next),
+    }
+  }
+  return null
 }
