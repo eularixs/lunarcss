@@ -15,10 +15,14 @@ import { useState } from 'react'
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import Animated, {
   Easing,
+  interpolateColor,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated'
+// Lunar resolver — exposed as `tw` so we can build base styles outside JSX.
+// `__lcssTw` is the same engine the transformer injects automatically.
+import { __lcssTw } from 'lunarcss/runtime'
 
 export default function MotionScreen() {
   return (
@@ -59,14 +63,14 @@ export default function MotionScreen() {
       </Section>
 
       <Section
-        eyebrow="Class-driven · web only"
-        title="Tap to toggle (visible on web)"
-        description="Native View does not animate inline styles, so these toggle instantly on iOS/Android. RN-Web compiles transition* keys to real CSS — see browser."
+        eyebrow="Lunar baseStyle + Reanimated"
+        title="Tap to animate (iOS, Android, web)"
+        description="Lunar provides the static style via __lcssTw(); Reanimated drives the animated bits. The two merge in useAnimatedStyle. Same demo runs on every platform."
       >
         <View className="gap-3">
-          <ClassToggleColors />
-          <ClassToggleOpacity />
-          <ClassToggleScale />
+          <ToggleColors />
+          <ToggleOpacity />
+          <ToggleScale />
         </View>
       </Section>
 
@@ -132,60 +136,89 @@ function Demo({ label, children }: { label: string; children: React.ReactNode })
   )
 }
 
-// --- Class-driven toggles (web visible) -------------------------------------
+// --- Lunar baseStyle + Reanimated drivers -----------------------------------
 //
-// Same outer wrapper persists across re-renders. Only the trailing utility
-// changes — RN-Web emits a stable transition rule and swaps just the changed
-// property class. Browser interpolates. Native sees no motion (inline styles
-// don't animate).
+// Pattern (per docs/known-limitations § motion):
+//   1. Build a static baseStyle from a lunar className via __lcssTw().
+//   2. Drive a Reanimated shared value with withTiming on interaction.
+//   3. Merge the two inside useAnimatedStyle — return { ...baseStyle, ... }.
+//
+// __lcssTw produces a plain object captured at module load (worklet-safe via
+// the closed-over reference). Reanimated owns the animated keys; lunar owns
+// everything else.
 
-function ClassToggleColors() {
+function ToggleColors() {
   const [on, setOn] = useState(false)
+  // Resolve both target colors once. The animated bg interpolates between
+  // them on the UI thread.
+  const primaryStyle = __lcssTw('bg-primary')
+  const accentStyle = __lcssTw('bg-accent')
+  const PRIMARY = String(primaryStyle.backgroundColor ?? '#6366f1')
+  const ACCENT = String(accentStyle.backgroundColor ?? '#f59e0b')
+
+  const baseStyle = __lcssTw('rounded-pill px-5 py-3')
+  const progress = useSharedValue(0)
+  const aStyle = useAnimatedStyle(() => ({
+    ...baseStyle,
+    backgroundColor: interpolateColor(progress.value, [0, 1], [PRIMARY, ACCENT]),
+  }))
+
   return (
-    <Pressable onPress={() => setOn((v) => !v)}>
-      <View
-        className={[
-          'rounded-pill px-5 py-3 transition-colors duration-300 ease-in-out',
-          on ? 'bg-accent' : 'bg-primary',
-        ].join(' ')}
-      >
+    <Pressable
+      onPress={() => {
+        progress.value = withTiming(on ? 0 : 1, TIMING)
+        setOn((v) => !v)
+      }}
+    >
+      <Animated.View style={aStyle}>
         <Text className="text-center text-white font-semibold">
-          transition-colors · {on ? 'accent' : 'primary'}
+          interpolateColor · {on ? 'accent' : 'primary'}
         </Text>
-      </View>
+      </Animated.View>
     </Pressable>
   )
 }
 
-function ClassToggleOpacity() {
+function ToggleOpacity() {
   const [on, setOn] = useState(true)
+  const tileBase = __lcssTw('size-12 rounded-md bg-accent')
+  const op = useSharedValue(1)
+  const aStyle = useAnimatedStyle(() => ({ ...tileBase, opacity: op.value }))
+
   return (
-    <Pressable onPress={() => setOn((v) => !v)}>
+    <Pressable
+      onPress={() => {
+        op.value = withTiming(on ? 0.25 : 1, TIMING)
+        setOn((v) => !v)
+      }}
+    >
       <View className="rounded-card border border-zinc-800 bg-zinc-900 p-card items-center gap-3">
-        <Text className="text-xs text-zinc-500">tap → toggle opacity (web)</Text>
-        <View
-          className={[
-            'size-12 rounded-md bg-accent transition-opacity duration-300 ease-out',
-            on ? 'opacity-100' : 'opacity-25',
-          ].join(' ')}
-        />
+        <Text className="text-xs text-zinc-500">tap → opacity 1 ↔ 0.25</Text>
+        <Animated.View style={aStyle} />
       </View>
     </Pressable>
   )
 }
 
-function ClassToggleScale() {
+function ToggleScale() {
   const [big, setBig] = useState(false)
+  const tileBase = __lcssTw('size-12 rounded-md bg-primary')
+  const scale = useSharedValue(1)
+  const aStyle = useAnimatedStyle(() => ({
+    ...tileBase,
+    transform: [{ scale: scale.value }],
+  }))
+
   return (
-    <Pressable onPress={() => setBig((v) => !v)}>
+    <Pressable
+      onPress={() => {
+        scale.value = withTiming(big ? 1 : 1.5, TIMING)
+        setBig((v) => !v)
+      }}
+    >
       <View className="rounded-card border border-zinc-800 bg-zinc-900 p-card items-center gap-3">
-        <Text className="text-xs text-zinc-500">tap → toggle scale (web)</Text>
-        <View
-          className={[
-            'size-12 rounded-md bg-primary transition-transform duration-300 ease-in-out',
-            big ? 'scale-150' : 'scale-100',
-          ].join(' ')}
-        />
+        <Text className="text-xs text-zinc-500">tap → scale 1 ↔ 1.5</Text>
+        <Animated.View style={aStyle} />
       </View>
     </Pressable>
   )
