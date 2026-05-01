@@ -31,5 +31,10 @@ export default defineConfig({
     '@babel/traverse',
     '@babel/types',
     'postcss',
+    // Must stay external: Metro's resolveRequest in withLunarCSS swaps this
+    // bare specifier to the user's generated .lunarcss/__theme__.js at bundle
+    // time. If tsup inlines it here, the bundle ships with the empty default
+    // tokens and Metro never gets a chance to redirect.
+    'lunarcss/__theme__',
   ],
 })

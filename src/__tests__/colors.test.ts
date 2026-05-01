@@ -76,4 +76,47 @@ describe('colors utility', () => {
     const r = resolveColor('ring-black')
     expect(r!.style).toEqual({ shadowColor: '#000000' })
   })
+
+  describe('Tailwind v3 palette fallback', () => {
+    it('resolves bg-zinc-900 to #18181b', () => {
+      const r = resolveColor('bg-zinc-900')
+      expect(r!.style).toEqual({ backgroundColor: '#18181b' })
+    })
+
+    it('resolves text-zinc-400 to #a1a1aa', () => {
+      const r = resolveColor('text-zinc-400')
+      expect(r!.style).toEqual({ color: '#a1a1aa' })
+    })
+
+    it('resolves border-zinc-800 to #27272a', () => {
+      const r = resolveColor('border-zinc-800')
+      expect(r!.style).toEqual({ borderColor: '#27272a' })
+    })
+
+    it('resolves bg-zinc-950/50 with opacity', () => {
+      const r = resolveColor('bg-zinc-950/50')
+      expect(r!.style.backgroundColor).toMatch(/^rgba\(9,9,11,0\.5\)$/)
+    })
+
+    it('resolves text-slate-500 to #64748b', () => {
+      const r = resolveColor('text-slate-500')
+      expect(r!.style).toEqual({ color: '#64748b' })
+    })
+
+    it('resolves bg-red-500 to #ef4444', () => {
+      const r = resolveColor('bg-red-500')
+      expect(r!.style).toEqual({ backgroundColor: '#ef4444' })
+    })
+
+    it('user token overrides palette for the same scale name', () => {
+      setTokens({ '--color-zinc-900': '#000000' })
+      const r = resolveColor('bg-zinc-900')
+      expect(r!.style).toEqual({ backgroundColor: '#000000' })
+    })
+
+    it('returns null for unknown step in known scale', () => {
+      const r = resolveColor('bg-zinc-1234')
+      expect(r).toBeNull()
+    })
+  })
 })

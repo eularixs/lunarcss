@@ -7,6 +7,7 @@ import { resolveTypography } from './typography.js'
 import { resolveBorders } from './borders.js'
 import { resolveEffects } from './effects.js'
 import { resolveTransforms } from './transforms.js'
+import { resolveTransitions } from './transitions.js'
 import { resolveContainers } from './containers.js'
 
 type UtilityResolver = (className: string) => ResolveResult | null
@@ -18,6 +19,7 @@ const RESOLVERS: readonly UtilityResolver[] = [
   resolveContainers,
   resolveLayout,
   resolveTypography,
+  resolveTransitions,
   resolveTransforms,
   resolveEffects,
   resolveBorders,

@@ -9,6 +9,7 @@
     "borders",
     "effects",
     "transforms",
+    "transitions",
     "containers",
     "modifiers"
   ]

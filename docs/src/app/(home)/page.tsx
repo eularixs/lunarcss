@@ -119,8 +119,8 @@ export default function HomePage() {
         </div>
         <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-7 text-center">
           <div className="flex flex-wrap items-center justify-center gap-2">
-            <Badge label="tests" value="240 passing" color="text-green-500" />
-            <Badge label="core" value="9.18 kb gzip" color="text-blue-500" />
+            <Badge label="tests" value="306 passing" color="text-green-500" />
+            <Badge label="core" value="11.17 kb gzip" color="text-blue-500" />
             <Badge label="license" value="MIT" color="text-fd-foreground" />
           </div>
           <h1 className="bg-gradient-to-br from-fd-foreground to-fd-foreground/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-6xl">

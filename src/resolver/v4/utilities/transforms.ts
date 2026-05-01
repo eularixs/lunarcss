@@ -89,6 +89,14 @@ function negateAngle(v: string): string {
 }
 
 export function resolveTransforms(className: string): ResolveResult | null {
+  // Bare `transform` is a Tailwind enable-flag marker. On the web it activates
+  // the GPU transform context; on RN there's no equivalent — transforms apply
+  // whenever a `transform` array is present. We emit an empty array so the
+  // class isn't reported as unrecognized, and so subsequent translate/scale/
+  // rotate utilities have an existing array to merge into.
+  if (className === 'transform') {
+    return { style: { transform: [] }, tokensUsed: [] }
+  }
   if (className === 'transform-none') {
     return { style: { transform: [] }, tokensUsed: [] }
   }

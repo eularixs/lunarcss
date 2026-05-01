@@ -9,9 +9,21 @@
 // the file is reported as `unchanged`.
 
 import { parse } from '@babel/parser'
-import generate from '@babel/generator'
-import traverse from '@babel/traverse'
+import generateImport from '@babel/generator'
+import traverseImport from '@babel/traverse'
 import * as t from '@babel/types'
+
+// CJS interop normalization — see metro/transform-classnames.ts for rationale.
+type TraverseFn = typeof traverseImport
+type GenerateFn = typeof generateImport
+const traverse: TraverseFn =
+  typeof traverseImport === 'function'
+    ? traverseImport
+    : ((traverseImport as unknown as { default: TraverseFn }).default)
+const generate: GenerateFn =
+  typeof generateImport === 'function'
+    ? generateImport
+    : ((generateImport as unknown as { default: GenerateFn }).default)
 
 export interface MergeResult {
   changed: boolean

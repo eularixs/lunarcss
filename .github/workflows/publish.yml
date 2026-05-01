@@ -42,9 +42,9 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      # pnpm version is read from `packageManager` in package.json.
+      # Do not pass `with.version` — pnpm/action-setup@v4 errors when both are set.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - uses: actions/setup-node@v4
         with:

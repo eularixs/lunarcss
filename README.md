@@ -2,7 +2,7 @@
 
 > Plug-and-play Tailwind v4 styling engine for React Native and Web. Zero-config. One source of truth.
 
-[![tests](https://img.shields.io/badge/tests-240%20passing-brightgreen)]() [![core](https://img.shields.io/badge/core-9.18kb%20gzip-blue)]() [![license](https://img.shields.io/badge/license-MIT-blue)]()
+[![tests](https://img.shields.io/badge/tests-306%20passing-brightgreen)]() [![core](https://img.shields.io/badge/core-11.17kb%20gzip-blue)]() [![license](https://img.shields.io/badge/license-MIT-blue)]()
 
 ---
 
@@ -116,6 +116,153 @@ import './globals.css'
 ```
 
 Use `className` like usual — Tailwind compiles it, your custom tokens work cross-platform.
+
+---
+
+## Web vs Native behavior
+
+LunarCSS runs the **same engine on web and native**: the Metro transformer rewrites `className` to `style={__lcssTw(...)}` on every platform, the resolver translates the class string into an RN style object, and react-native-web turns that style object into atomic CSS at render time.
+
+| Concern | Native (iOS / Android) | Web |
+| :-- | :-- | :-- |
+| `className` | Rewritten by Metro transformer to `style={__lcssTw('...')}`. | Same rewrite. |
+| `__lcssTw(cls)` | Returns RN style object: `{ backgroundColor, padding, ... }`. | Same — RN-Web emits atomic CSS from the result. |
+| `tw(cls)` | Alias for `__lcssTw`. | Same. |
+| `useLunarCSS().tw` / `.token` | Reads the global token registry. | Same registry (`globalThis.__LUNARCSS_RUNTIME__`). |
+| `vars.<name>` / `lunarTheme(spec)` | Resolves via namespace probe. | Same. |
+| `styledComponent(C)` | Converts each className prop to its style counterpart. | Same. |
+
+**Why not Tailwind CSS on web?** react-native-web's `View` / `Text` / `Pressable` / etc. strip the `className` prop at render time (`forwardedProps.defaultProps` allowlist does not include it). Even when Tailwind generates the matching CSS rules, the class never reaches the DOM, so nothing applies. Patching RN-Web's allowlist post-load is too late — `View` captures `forwardPropsList` at module init via `Object.assign`. Running the lunar resolver on web sidesteps the issue entirely: one engine, one source of truth, no Tailwind dependency.
+
+**Coverage**: the lunar resolver supports the same utility set across platforms — spacing, colors (Tailwind v3 palette + custom tokens), layout, sizing, typography, borders, effects, transforms, transitions, containers, plus the full modifier chain (`dark:` / `ios:` / `web:` / `active:` / `sm:` ...).
+
+---
+
+## Multi-style components
+
+The transformer rewrites every whitelisted RN component automatically. For
+multi-style-prop components, lunarcss exposes a sibling `<x>ClassName` prop
+per `<x>Style`:
+
+```tsx
+<ScrollView
+  className="flex-1 bg-zinc-950"           // → style
+  contentContainerClassName="p-card gap-4"  // → contentContainerStyle
+/>
+
+<ImageBackground
+  className="flex-1"            // → style
+  imageClassName="opacity-50"   // → imageStyle
+  source={...}
+/>
+
+<FlatList
+  className="flex-1"
+  contentContainerClassName="p-4"
+  data={...}
+/>
+```
+
+Whitelisted intrinsics (transformer rewrites for free):
+`View`, `Text`, `Image`, `ImageBackground`, `ScrollView`, `FlatList`,
+`SectionList`, `VirtualizedList`, `TextInput`, `TouchableOpacity`,
+`TouchableHighlight`, `TouchableWithoutFeedback`, `Pressable`,
+`SafeAreaView`, `Modal`, `ActivityIndicator`, `KeyboardAvoidingView`,
+`Switch`.
+
+---
+
+## `styledComponent` — escape hatch
+
+For third-party components NOT in the whitelist (LinearGradient, BlurView,
+your own design-system primitives), wrap with `styledComponent`:
+
+```tsx
+import { styledComponent } from 'lunarcss'
+import { LinearGradient as _LinearGradient } from 'expo-linear-gradient'
+
+const LinearGradient = styledComponent(_LinearGradient)
+
+// Usage — works on native AND web:
+<LinearGradient className="rounded-card overflow-hidden" colors={[...]} />
+```
+
+For multi-style-prop components, declare the style props:
+
+```tsx
+import { BlurView as _BlurView } from 'expo-blur'
+
+const BlurView = styledComponent(_BlurView, {
+  styleProps: ['style', 'tintStyle'],
+})
+
+// Now both class props are supported:
+<BlurView className="rounded-card" tintClassName="bg-zinc-900/60" />
+```
+
+**Migration from inline `className`-on-custom-component:** if you have a
+component that already accepts a `className` string prop and forwards it
+to a child, leave it alone — `styledComponent` is only needed for
+components that consume RN style objects directly.
+
+---
+
+## Programmatic APIs
+
+For values you can't pass through JSX `className` (StatusBar, navigation
+themes, animated values), use:
+
+### `useLunarCSS()`
+
+```tsx
+import { useLunarCSS } from 'lunarcss'
+
+function Screen() {
+  const { tw, token } = useLunarCSS()
+  return (
+    <>
+      <StatusBar backgroundColor={token('--color-primary')} />
+      <Animated.View style={tw('bg-primary p-card')} />
+    </>
+  )
+}
+```
+
+### `vars`
+
+Typed token accessor backed by the live registry:
+
+```tsx
+import { vars } from 'lunarcss'
+
+vars.primary  // "#6366f1"
+vars.accent   // "#f59e0b"
+vars.card     // "24px"  — bare names probe color → spacing → radius → text → width
+```
+
+### `lunarTheme(spec)`
+
+Map logical names to resolved token values. Useful for libraries that take
+theme objects (React Navigation, Reanimated, etc.):
+
+```tsx
+import { lunarTheme } from 'lunarcss'
+import { ThemeProvider } from '@react-navigation/native'
+
+const NavTheme = {
+  dark: true,
+  colors: lunarTheme({
+    primary: '--color-primary',
+    background: '--color-surface',
+    card: 'surface',     // bare name → namespace probe
+    text: 'primary',
+    border: 'muted',
+    notification: 'accent',
+  }),
+}
+
+<ThemeProvider value={NavTheme}>...</ThemeProvider>
+```
 
 ---
 
@@ -362,9 +509,34 @@ Values: numeric × spacing base, fractions, `full` `auto` `screen` `px`, arbitra
 
 `scale-{n}` (n/100) · `scale-x/y-{n}` · `-scale-x-100` (mirror) · `scale-[1.2]`
 
-`skew-x/y-{n}` · `transform-none`
+`skew-x/y-{n}` · `transform` (Tailwind enable-flag, no-op on RN) · `transform-none`
 
 Multiple transform classes merge into one `transform: [...]` array, in className order.
+
+### Transitions
+
+CSS-style transition utilities. Output keys (`transitionProperty`, `transitionDuration`, `transitionDelay`, `transitionTimingFunction`) match `react-native-web` conventions: native View/Text silently ignore them; the web build wires them up automatically; an Animated/Reanimated layer can read them off `style` to drive its own animations.
+
+Property groups:
+
+`transition` (default — color, bg, border, opacity, transform, shadow, filter, ...) · `transition-all` · `transition-colors` · `transition-opacity` · `transition-transform` · `transition-shadow` · `transition-none`
+
+Duration: `duration-{ms}` (e.g. `duration-300`) · `duration-[200ms]` · `duration-[0.3s]` (seconds → ms)
+
+Delay: `delay-{ms}` · `delay-[200ms]`
+
+Easing: `ease-linear` `ease-in` `ease-out` `ease-in-out` · `ease-[cubic-bezier(0.1,0.7,1,0.1)]`
+
+Example:
+
+```tsx
+<View className="bg-primary transition-colors duration-200 ease-out active:bg-primary/80" />
+<View className="rotate-12 transition-transform duration-300 ease-in-out" />
+```
+
+**Visible motion needs two things:** (1) a state change after initial paint (toggle a class via `useState` etc — utility generation alone is not motion), and (2) a runtime that reads the style keys. The browser's CSS engine reads `transitionDuration` etc. directly off RN-Web's emitted style and interpolates. On native, `<View>` does NOT animate inline styles — drive a Reanimated `useSharedValue` + `withTiming({ duration, easing })` and apply via `useAnimatedStyle`. See `example/app/(tabs)/motion.tsx` for both layers.
+
+**Out of MVP scope:** keyframe-style `animate-spin` / `animate-pulse` / `animate-bounce`. The MVP deliberately does NOT depend on Reanimated for the resolver itself.
 
 ### Containers
 
