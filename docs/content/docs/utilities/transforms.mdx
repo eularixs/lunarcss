@@ -69,11 +69,14 @@ skew-x-{n}    → { skewX: 'Ndeg' }
 skew-y-{n}    → { skewY: 'Ndeg' }
 ```
 
-## Reset
+## Reset and enable-flag
 
 ```
+transform       → transform: []   (Tailwind enable-flag, no-op on RN)
 transform-none  → transform: []
 ```
+
+The bare `transform` class is a no-op on React Native (transforms apply whenever a `transform` array exists). It's accepted to match Tailwind's web semantics so cross-platform code does not warn.
 
 ## Stacking multiple transforms
 

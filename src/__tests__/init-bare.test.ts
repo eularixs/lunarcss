@@ -37,12 +37,14 @@ describe('runInitBare (fresh project)', () => {
     expect(readFileSync(join(root, '.gitignore'), 'utf8')).toMatch(/# LunarCSS\n\.lunarcss\//)
   })
 
-  it('does NOT create any CSS files', () => {
+  it('does not create web styling files (web uses same lunar engine as native)', () => {
     const root = mkRoot()
     runInitBare({ projectRoot: root })
-    expect(existsSync(join(root, 'app/globals.css'))).toBe(false)
+    // Web no longer needs Tailwind/PostCSS — the lunar resolver runs on web
+    // too, since react-native-web strips className from primitives.
     expect(existsSync(join(root, 'global.css'))).toBe(false)
-    expect(existsSync(join(root, 'lunar.css'))).toBe(false)
+    expect(existsSync(join(root, 'postcss.config.js'))).toBe(false)
+    expect(existsSync(join(root, 'app/globals.css'))).toBe(false)
   })
 })
 

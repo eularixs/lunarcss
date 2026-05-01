@@ -2,8 +2,9 @@ import { ScrollView, Text, View } from 'react-native'
 
 export default function ShowcaseScreen() {
   return (
+    <>
     <ScrollView
-      className="flex-1 bg-zinc-950"
+      className="flex-1 bg-zinc-950 p-3 mt-10"
       contentContainerClassName="px-6 pt-20 pb-12 gap-section"
     >
       {/* Hero */}
@@ -124,6 +125,7 @@ export default function ShowcaseScreen() {
         </Text>
       </View>
     </ScrollView>
+    </>
   )
 }
 

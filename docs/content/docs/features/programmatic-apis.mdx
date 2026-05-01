@@ -1,0 +1,73 @@
+---
+title: Programmatic APIs
+description: useLunarCSS hook, vars Proxy, lunarTheme helper for non-className contexts.
+---
+
+For values you cannot pass through JSX `className` — StatusBar tints, navigation themes, animated values, charts — lunarcss exposes three programmatic APIs. All three read the same `globalThis.__LUNARCSS_RUNTIME__` registry that the resolver and transformer use, so values stay in sync across web and native.
+
+## `useLunarCSS()`
+
+Returns a singleton with two methods:
+
+```tsx
+import { useLunarCSS } from 'lunarcss'
+
+function Screen() {
+  const { tw, token } = useLunarCSS()
+  return (
+    <>
+      <StatusBar backgroundColor={token('--color-primary')} />
+      <Animated.View style={tw('bg-primary p-card')} />
+    </>
+  )
+}
+```
+
+- `tw(classes)` — same engine as the transformer-injected `__lcssTw`. Returns a `StyleSheet`-compatible style object. Use it inside Reanimated `useAnimatedStyle` worklets, Animated.Value style props, or anywhere JSX `className` is unavailable.
+- `token(name)` — direct token lookup. Pass a fully-qualified CSS variable (`--color-primary`) for an exact lookup, or a bare name (`primary`) for a namespace-resolved lookup that probes color → spacing → radius → text → width in order.
+
+The hook does NOT subscribe to theme-change events. Token mutations between renders are handled by the resolver's theme-hash invalidation; subscribing here would re-render every mounted component on every `setTokens` call. Apps that hot-swap themes should call `subscribeTheme()` explicitly.
+
+## `vars`
+
+Typed Proxy backed by the live token registry:
+
+```tsx
+import { vars } from 'lunarcss'
+
+vars.primary  // "#6366f1"
+vars.accent   // "#f59e0b"
+vars.card     // "24px"  — bare names probe the namespace chain
+vars['--color-primary']  // "#6366f1"  — fully-qualified bypasses the chain
+```
+
+`Object.keys(vars)` enumerates the bare names of every registered token (color, spacing, radius, text, width). Property descriptors are read-only — `vars.primary = '...'` is a no-op.
+
+## `lunarTheme(spec)`
+
+Map logical names to resolved token values. Useful for libraries that take a flat theme object (React Navigation, Reanimated, charts):
+
+```tsx
+import { lunarTheme } from 'lunarcss'
+import { ThemeProvider } from '@react-navigation/native'
+
+const NavTheme = {
+  dark: true,
+  colors: lunarTheme({
+    primary: '--color-primary',
+    background: '--color-surface',
+    card: 'surface',     // bare name → namespace probe
+    text: 'primary',
+    border: 'muted',
+    notification: 'accent',
+  }),
+}
+
+<ThemeProvider value={NavTheme}>...</ThemeProvider>
+```
+
+Each spec value can be a fully-qualified CSS variable (`--color-...`) or a bare name resolved via the same chain `vars` uses. Unknown names resolve to `undefined`.
+
+## Web parity
+
+All three APIs read the same global registry. The web bundle's runtime hydrates the registry from `lunarcss/__theme__` exactly like native, so `vars.primary` returns `"#6366f1"` on both platforms — no Tailwind dependency, no DOM-side custom-property lookup.

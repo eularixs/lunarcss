@@ -1,0 +1,39 @@
+---
+title: Web Strategy
+description: Why lunarcss runs the same engine on web and native, and not Tailwind CSS.
+---
+
+Lunarcss runs the **same resolver on web and native**. The Metro transformer rewrites `className` to `style={__lcssTw(...)}` on every platform; the resolver translates the class string into an RN style object; react-native-web turns that style object into atomic CSS at render time.
+
+| Concern | Native (iOS / Android) | Web |
+| :-- | :-- | :-- |
+| `className` | Rewritten by Metro transformer to `style={__lcssTw('...')}`. | Same rewrite. |
+| `__lcssTw(cls)` | Returns RN style object. | Same — RN-Web emits atomic CSS from the result. |
+| Token registry | `globalThis.__LUNARCSS_RUNTIME__` | Same global. |
+| `useLunarCSS`, `vars`, `lunarTheme`, `styledComponent` | Engine-driven. | Identical. |
+
+## Why not Tailwind CSS on web?
+
+react-native-web's `View` / `Text` / `Pressable` strip the `className` prop at render time — its [`forwardedProps.defaultProps`](https://github.com/necolas/react-native-web) allowlist does not include `className`. RN-Web's primitives capture the allowlist via `Object.assign` at module init, so even patching it later does not help: the `View` module already cached the list.
+
+That means even when Tailwind generates the matching CSS rules, **the class string never reaches the DOM**. We tested this end-to-end: an 18 KB Tailwind stylesheet linked in the SSR HTML, but elements rendered with only RN-Web's atomic class hashes (`css-g5y9jx r-13awgt0`). Zero `bg-primary`, zero `flex-1`, zero token hits.
+
+Running the lunar resolver on web sidesteps the issue entirely.
+
+## What it costs
+
+- No Tailwind CSS dependency on web.
+- No `tailwindcss` / `@tailwindcss/postcss` install for native projects targeting web.
+- No `global.css` / `postcss.config.js` to maintain.
+- The resolver covers the same utility set on both platforms — spacing, colors (Tailwind v3 palette + custom tokens), layout, sizing, typography, borders, effects, transforms, transitions, containers, plus the full modifier chain (`dark:`, `ios:`, `web:`, `active:`, `sm:` ...).
+
+## What it gives up
+
+- Tailwind v4's full DSL on web (utilities outside lunar's resolver scope, plugin ecosystem, JIT). If you need a Tailwind utility lunarcss does not implement yet, [open an issue](https://github.com/eularix/lunarcss/issues).
+- Hot-swap of Tailwind themes via CSS — lunarcss themes hot-reload through Metro restart on native and PostCSS dependency on a separate web pipeline if you wire one. Both routes drive the same registry.
+
+## Transitions on web
+
+The transition utilities (`transition`, `duration-*`, `ease-*`, `delay-*`) emit **CSS time strings** (`"300ms"`, `"cubic-bezier(0.4, 0, 0.2, 1)"`) so RN-Web's value normalizer doesn't append `"px"` to bare numbers. The browser's CSS engine reads those keys directly off the emitted style and animates. On native, drive a Reanimated `useSharedValue` + `withTiming({ duration, easing })` and apply via `useAnimatedStyle`.
+
+See `example/app/(tabs)/motion.tsx` for the full pattern.

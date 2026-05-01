@@ -32,16 +32,16 @@ The web path already has hot-reload via PostCSS dependency messages.
 
 - **Storybook** — `@storybook/react-native` addon for LunarCSS className preview
 - **Expo Router** — verified compatibility with file-based routing and shared layouts
-- **React Navigation** — guide for applying LunarCSS tokens to navigation theming
+- **React Navigation** — guide for applying lunarcss tokens to navigation theming
 - **Tamagui interop** — migration guide for Tamagui users
 
 ## `color-mix()` on mobile
 
 Currently unsupported on mobile. v0.3.0 plans to pre-compute `color-mix()` values via `culori` during token flatten, so tokens using `color-mix()` work cross-platform.
 
-## Tailwind v3 fallback
+## Tailwind v3 resolver parity (deferred)
 
-Optional v3 compatibility mode for codebases with mixed v3/v4 dependencies. Scope limited to the class resolver — Metro transform is v4 only.
+The Tailwind v3 named color palette ships in v0.2.0 as a fallback inside the v4 resolver — `bg-zinc-900`, `text-slate-500`, `bg-red-500/40` all work without any user config. A broader v3 resolver (modifier semantics, screen breakpoint defaults) remains deferred. Open an issue if your codebase needs it.
 
 ## Status
 
