@@ -1,15 +1,42 @@
 name: Publish Beta
 
+# Beta releases publish from `dev`. Trigger by including `release: beta` in
+# the head commit message (PR title also works when squash-merging — the PR
+# title becomes the squash commit message).
+#
+# Stable releases (`release: patch|minor|major`) live in `publish.yml` and
+# fire only from `main`.
+
 on:
   push:
     branches:
       - dev
 
 jobs:
+  check-trigger:
+    name: Check beta release trigger
+    runs-on: ubuntu-latest
+    outputs:
+      should_publish: ${{ steps.check.outputs.should_publish }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check commit message
+        id: check
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          if echo "${COMMIT_MSG}" | grep -qE '^release: beta\b'; then
+            echo "should_publish=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "should_publish=false" >> "$GITHUB_OUTPUT"
+          fi
+
   publish-beta:
     name: Publish beta to npm
+    needs: check-trigger
+    if: needs.check-trigger.outputs.should_publish == 'true'
     runs-on: ubuntu-latest
-    if: "${{ contains(github.event.head_commit.message, 'release: beta') }}"
     permissions:
       contents: write
     steps:
@@ -49,6 +76,9 @@ jobs:
         id: bump
         run: |
           CURRENT=$(node -p "require('./package.json').version")
+          # If the current version is already a beta (e.g. 0.2.0-beta.3), bump
+          # the prerelease counter (-> 0.2.0-beta.4). Otherwise enter beta
+          # mode at the next minor (-> 0.2.0-beta.0 or similar).
           if echo "${CURRENT}" | grep -qE '\-beta\.[0-9]+$'; then
             npm version prerelease --preid=beta --no-git-tag-version
           else
