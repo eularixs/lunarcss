@@ -1,11 +1,14 @@
 name: Publish Beta
 
-# Beta releases publish from `dev`. Trigger by including `release: beta` in
-# the head commit message (PR title also works when squash-merging — the PR
-# title becomes the squash commit message).
+# Beta releases publish from `dev`. Same trigger surface as `publish.yml`:
+# include `release: patch|minor|major` in the head commit message. The bump
+# type chooses which level enters beta when transitioning from a stable
+# version (1.2.3 → 1.2.4-beta.0 / 1.3.0-beta.0 / 2.0.0-beta.0). When the
+# current version is already a beta (X.Y.Z-beta.N), the type is ignored and
+# the prerelease counter increments (X.Y.Z-beta.N+1).
 #
-# Stable releases (`release: patch|minor|major`) live in `publish.yml` and
-# fire only from `main`.
+# Stable releases on `main` are handled by `publish.yml` with the same
+# `release: patch|minor|major` directive.
 
 on:
   push:
@@ -14,10 +17,11 @@ on:
 
 jobs:
   check-trigger:
-    name: Check beta release trigger
+    name: Check release trigger
     runs-on: ubuntu-latest
     outputs:
       should_publish: ${{ steps.check.outputs.should_publish }}
+      bump_type: ${{ steps.check.outputs.bump_type }}
     steps:
       - uses: actions/checkout@v4
 
@@ -26,10 +30,16 @@ jobs:
         env:
           COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
-          if echo "${COMMIT_MSG}" | grep -qE '^release: beta\b'; then
+          # Match `release: (patch|minor|major)` either at the start of the
+          # commit message or after a separator (newline / space / comma).
+          # Lets squash-merge titles like `fix: foo, release: minor` trigger.
+          if printf '%s' "${COMMIT_MSG}" | grep -qE '(^|[[:space:],])release: (patch|minor|major)\b'; then
+            BUMP=$(printf '%s' "${COMMIT_MSG}" | grep -oE 'release: (patch|minor|major)' | head -n1 | awk '{print $2}')
             echo "should_publish=true" >> "$GITHUB_OUTPUT"
+            echo "bump_type=${BUMP}" >> "$GITHUB_OUTPUT"
           else
             echo "should_publish=false" >> "$GITHUB_OUTPUT"
+            echo "bump_type=" >> "$GITHUB_OUTPUT"
           fi
 
   publish-beta:
@@ -72,17 +82,23 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Bump prerelease version
+      - name: Bump beta version
         id: bump
+        env:
+          BUMP_TYPE: ${{ needs.check-trigger.outputs.bump_type }}
         run: |
           CURRENT=$(node -p "require('./package.json').version")
-          # If the current version is already a beta (e.g. 0.2.0-beta.3), bump
-          # the prerelease counter (-> 0.2.0-beta.4). Otherwise enter beta
-          # mode at the next minor (-> 0.2.0-beta.0 or similar).
           if echo "${CURRENT}" | grep -qE '\-beta\.[0-9]+$'; then
+            # Already in beta — type is ignored; just bump the counter.
             npm version prerelease --preid=beta --no-git-tag-version
           else
-            npm version preminor --preid=beta --no-git-tag-version
+            # Entering beta from a stable version. Map type → pre<type>.
+            case "${BUMP_TYPE}" in
+              patch) npm version prepatch --preid=beta --no-git-tag-version ;;
+              minor) npm version preminor --preid=beta --no-git-tag-version ;;
+              major) npm version premajor --preid=beta --no-git-tag-version ;;
+              *) echo "Unknown BUMP_TYPE='${BUMP_TYPE}'"; exit 1 ;;
+            esac
           fi
           NEW_VERSION=$(node -p "require('./package.json').version")
           echo "new_version=${NEW_VERSION}" >> "$GITHUB_OUTPUT"
