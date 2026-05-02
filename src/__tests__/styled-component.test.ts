@@ -21,13 +21,26 @@ describe('styledComponent (native)', () => {
   beforeEach(async () => {
     vi.resetModules()
     delete process.env.EXPO_OS
-    const { setTokens, clearTokens } = await import('../runtime/tokens.js')
-    clearTokens()
-    setTokens({ '--color-primary': '#6366f1', '--spacing-card': '24px' })
   })
 
+  // Helper: load styled (which boots tw.ts → replaceTokens(empty) wipes
+  // the registry), THEN seed tokens. The order is important — replaceTokens
+  // is called once on boot from `@lunar-kit/css/__theme__` (which is empty
+  // in test env via the vitest alias), so seeding before import would be
+  // immediately wiped.
+  async function loadAndSeed(tokens: Record<string, string>) {
+    const styled = await import('../runtime/styled.js')
+    const { clearTokens, setTokens } = await import('../runtime/tokens.js')
+    clearTokens()
+    setTokens(tokens)
+    return styled
+  }
+
   it('converts className → style on native', async () => {
-    const { styledComponent } = await import('../runtime/styled.js')
+    const { styledComponent } = await loadAndSeed({
+      '--color-primary': '#6366f1',
+      '--spacing-card': '24px',
+    })
     const Wrapped = styledComponent(Stub)
     const node = asV(
       Wrapped({ className: 'bg-primary p-card' } as Record<string, unknown>) as ReactElement,
@@ -37,7 +50,10 @@ describe('styledComponent (native)', () => {
   })
 
   it('handles multiple style props (style + contentContainerStyle)', async () => {
-    const { styledComponent } = await import('../runtime/styled.js')
+    const { styledComponent } = await loadAndSeed({
+      '--color-primary': '#6366f1',
+      '--spacing-card': '24px',
+    })
     const Wrapped = styledComponent(Stub, {
       styleProps: ['style', 'contentContainerStyle'],
     })
@@ -54,7 +70,9 @@ describe('styledComponent (native)', () => {
   })
 
   it('preserves existing style by merging', async () => {
-    const { styledComponent } = await import('../runtime/styled.js')
+    const { styledComponent } = await loadAndSeed({
+      '--color-primary': '#6366f1',
+    })
     const Wrapped = styledComponent(Stub)
     const node = asV(
       Wrapped({
@@ -68,7 +86,7 @@ describe('styledComponent (native)', () => {
   })
 
   it('passes through when no className present', async () => {
-    const { styledComponent } = await import('../runtime/styled.js')
+    const { styledComponent } = await loadAndSeed({})
     const Wrapped = styledComponent(Stub)
     const node = asV(
       Wrapped({ style: { padding: 4 } } as Record<string, unknown>) as ReactElement,
@@ -93,13 +111,23 @@ describe('styledComponent (web)', () => {
   beforeEach(async () => {
     vi.resetModules()
     process.env.EXPO_OS = 'web'
-    const { setTokens, clearTokens } = await import('../runtime/tokens.js')
-    clearTokens()
-    setTokens({ '--color-primary': '#6366f1' })
   })
 
+  // Same load-then-seed pattern as the native suite — replaceTokens at boot
+  // (from `@lunar-kit/css/__theme__`) wipes the registry, so seed tokens
+  // AFTER the import.
+  async function loadAndSeed(tokens: Record<string, string>) {
+    const styled = await import('../runtime/styled.js')
+    const { clearTokens, setTokens } = await import('../runtime/tokens.js')
+    clearTokens()
+    setTokens(tokens)
+    return styled
+  }
+
   it('converts className → style on web (same engine as native)', async () => {
-    const { styledComponent } = await import('../runtime/styled.js')
+    const { styledComponent } = await loadAndSeed({
+      '--color-primary': '#6366f1',
+    })
     const Wrapped = styledComponent(Stub)
     const node = asV(
       Wrapped({ className: 'bg-primary flex-1' } as Record<string, unknown>) as ReactElement,
@@ -109,7 +137,9 @@ describe('styledComponent (web)', () => {
   })
 
   it('strips auxiliary <x>ClassName props after converting on web', async () => {
-    const { styledComponent } = await import('../runtime/styled.js')
+    const { styledComponent } = await loadAndSeed({
+      '--color-primary': '#6366f1',
+    })
     const Wrapped = styledComponent(Stub, {
       styleProps: ['style', 'contentContainerStyle'],
     })

@@ -6,11 +6,11 @@
   "author": "Eularix Team",
   "repository": {
     "type": "git",
-    "url": "https://github.com/eularix/lunarcss.git"
+    "url": "https://github.com/eularixs/lunarcss.git"
   },
-  "homepage": "https://github.com/eularix/lunarcss#readme",
+  "homepage": "https://github.com/eularixs/lunarcss#readme",
   "bugs": {
-    "url": "https://github.com/eularix/lunarcss/issues"
+    "url": "https://github.com/eularixs/lunarcss/issues"
   },
   "type": "module",
   "sideEffects": false,
