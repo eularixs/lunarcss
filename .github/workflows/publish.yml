@@ -22,9 +22,10 @@ jobs:
         run: |
           # Match `release: (patch|minor|major)` either at the start of the
           # commit message or after a separator (newline / space / comma).
-          # Lets squash-merge titles like `fix: foo, release: minor` trigger.
-          if printf '%s' "${COMMIT_MSG}" | grep -qE '(^|[[:space:],])release: (patch|minor|major)\b'; then
-            BUMP=$(printf '%s' "${COMMIT_MSG}" | grep -oE 'release: (patch|minor|major)' | head -n1 | awk '{print $2}')
+          # Case-insensitive so `Release: minor`, `RELEASE: PATCH`, etc.
+          # also trigger. Lowercases the captured bump type before use.
+          if printf '%s' "${COMMIT_MSG}" | grep -qiE '(^|[[:space:],])release: (patch|minor|major)\b'; then
+            BUMP=$(printf '%s' "${COMMIT_MSG}" | grep -oiE 'release: (patch|minor|major)' | head -n1 | awk '{print tolower($2)}')
             echo "should_publish=true" >> "$GITHUB_OUTPUT"
             echo "bump_type=${BUMP}" >> "$GITHUB_OUTPUT"
           else
