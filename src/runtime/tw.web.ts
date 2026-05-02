@@ -20,10 +20,10 @@ import { getCached, setCached } from './cache.js'
 import { getRuntimeContext } from './context.js'
 import { resolveClassList } from '../resolver/index.js'
 import { setTokens } from './tokens.js'
-import { THEME_TOKENS } from 'lunar-css/__theme__'
+import { THEME_TOKENS } from '@lunar-kit/css/__theme__'
 
 // Boot-time hydration. The transformer-injected `import { __lcssTw } from
-// 'lunar-css/runtime'` triggers this on web too — same lifecycle as native.
+// '@lunar-kit/css/runtime'` triggers this on web too — same lifecycle as native.
 setTokens(THEME_TOKENS as Record<string, string>)
 
 export function __lcssTw(className: string): ResolvedStyle {

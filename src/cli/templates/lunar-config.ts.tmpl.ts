@@ -1,7 +1,7 @@
 // Template body for the generated user-facing lunar.config.ts.
 // Kept as a TS string so we can ship it through tsup + maintain syntax.
 
-export const LUNAR_CONFIG_TEMPLATE = `import { defineConfig } from 'lunar-css'
+export const LUNAR_CONFIG_TEMPLATE = `import { defineConfig } from '@lunar-kit/css'
 
 export default defineConfig({
   theme: {

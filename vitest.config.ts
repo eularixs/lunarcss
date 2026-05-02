@@ -7,7 +7,7 @@ export default defineConfig({
       // Match the package self-reference used by src/runtime/tw.ts and tw.web.ts.
       // Vitest's Vite resolver does not honor package.json `exports`, so we
       // wire the bare specifier directly to the source default-empty theme.
-      'lunar-css/__theme__': fileURLToPath(new URL('./src/__theme__.ts', import.meta.url)),
+      '@lunar-kit/css/__theme__': fileURLToPath(new URL('./src/__theme__.ts', import.meta.url)),
     },
   },
   test: {

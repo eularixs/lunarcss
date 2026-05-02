@@ -43,7 +43,7 @@ export function runInitBare(options: InitBareOptions): InitBareReport {
     if (merge.reason === 'no-module-exports') {
       warnings.push(
         'metro.config.js exists but has no top-level `module.exports = ...` we could wrap. ' +
-          'Manually wrap your config with `withLunarCSS(...)` from `lunar-css/metro`.',
+          'Manually wrap your config with `withLunarCSS(...)` from `@lunar-kit/css/metro`.',
       )
       steps.push({ label: 'metro.config.js', result: { path: metroJsPath, status: 'unchanged' } })
     } else if (!merge.changed) {

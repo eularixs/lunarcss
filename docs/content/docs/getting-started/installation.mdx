@@ -6,11 +6,11 @@ description: Install LunarCSS and its peer dependencies.
 ## Install
 
 ```bash
-pnpm add lunar-css
+pnpm add @lunar-kit/css
 # or
-npm install lunar-css
+npm install @lunar-kit/css
 # or
-yarn add lunar-css
+yarn add @lunar-kit/css
 ```
 
 ## Peer dependencies
@@ -30,17 +30,17 @@ Add LunarCSS's `className` augmentations to your `tsconfig.json`:
 ```json
 {
   "compilerOptions": {
-    "types": ["lunar-css/types"]
+    "types": ["@lunar-kit/css/types"]
   }
 }
 ```
 
-The `lunar-css init` CLI does this automatically. If you're adding manually, append `"lunar-css/types"` to the existing `types` array.
+The `lunar-css init` CLI does this automatically. If you're adding manually, append `"@lunar-kit/css/types"` to the existing `types` array.
 
 ## What gets installed
 
 ```
-lunar-css/               ← core package
+@lunar-kit/css/               ← core package
   dist/
     index.js            ← mobile runtime (resolveClassList, tw())
     index.web.js        ← web passthrough stub

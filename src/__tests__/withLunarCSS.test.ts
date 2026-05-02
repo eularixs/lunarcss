@@ -36,7 +36,7 @@ describe('withLunarCSS', () => {
     expect(process.env.LUNARCSS_UPSTREAM_TRANSFORMER).toBe(userPath)
   })
 
-  it('routes lunar-css/__theme__ to virtual file', () => {
+  it('routes @lunar-kit/css/__theme__ to virtual file', () => {
     const root = mkRoot()
     writeFileSync(
       join(root, 'lunar.config.ts'),
@@ -49,7 +49,7 @@ describe('withLunarCSS', () => {
     const fakeContext = {
       resolveRequest: () => ({ type: 'sourceFile' as const, filePath: '/should-not-reach' }),
     }
-    const resolution = fn!(fakeContext, 'lunar-css/__theme__', 'ios')
+    const resolution = fn!(fakeContext, '@lunar-kit/css/__theme__', 'ios')
     expect(resolution.type).toBe('sourceFile')
     expect(resolution.filePath).toMatch(/\.lunarcss[\\/]__theme__\.js$/)
   })

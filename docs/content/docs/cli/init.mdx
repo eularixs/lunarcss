@@ -34,15 +34,15 @@ Expo wins when both `expo` and `react-native` are present.
 ```
 lunar.config.ts        created — token source of truth
 metro.config.js        created or AST-merged
-.gitignore             updated — .lunar-css/ ignored
-tsconfig.json          updated — types: ["lunar-css/types"]
+.gitignore             updated — .@lunar-kit/css/ ignored
+tsconfig.json          updated — types: ["@lunar-kit/css/types"]
 ```
 
 Default `metro.config.js`:
 
 ```js
 const { getDefaultConfig } = require('expo/metro-config')
-const { withLunarCSS } = require('lunar-css/metro')
+const { withLunarCSS } = require('@lunar-kit/css/metro')
 
 const config = getDefaultConfig(__dirname)
 module.exports = withLunarCSS(config)
@@ -62,7 +62,7 @@ tsconfig.json          updated
 ```css
 /* LunarCSS */
 @import "tailwindcss";
-@plugin "lunar-css";
+@plugin "@lunar-kit/css";
 ```
 
 The CLI searches 8 candidate paths for an existing globals CSS file before creating a new one.
@@ -73,7 +73,7 @@ Same as Expo but uses `@react-native/metro-config` + `mergeConfig`:
 
 ```js
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config')
-const { withLunarCSS } = require('lunar-css/metro')
+const { withLunarCSS } = require('@lunar-kit/css/metro')
 
 const config = {}
 module.exports = withLunarCSS(mergeConfig(getDefaultConfig(__dirname), config))
@@ -84,7 +84,7 @@ module.exports = withLunarCSS(mergeConfig(getDefaultConfig(__dirname), config))
 All runners generate the same starter config:
 
 ```ts
-import { defineConfig } from 'lunar-css'
+import { defineConfig } from '@lunar-kit/css'
 
 export default defineConfig({
   theme: {

@@ -1,9 +1,9 @@
 // Ambient module augmentation: add `className` prop to RN core components.
-// Consumers reference via tsconfig "types": ["lunar-css/types"] or
-//   /// <reference types="lunar-css/types" />
+// Consumers reference via tsconfig "types": ["@lunar-kit/css/types"] or
+//   /// <reference types="@lunar-kit/css/types" />
 
 // CRITICAL: do NOT `import` from 'react-native' at the type level here.
-// The emitted d.ts ships in `node_modules/lunar-css/dist/types/`. If it imports
+// The emitted d.ts ships in `node_modules/@lunar-kit/css/dist/types/`. If it imports
 // from 'react-native', TS resolves that against lunarcss's *own* RN (its
 // devDep version), so the augmentation lands on the wrong module instance and
 // consumer apps that use a different RN never see `className`.

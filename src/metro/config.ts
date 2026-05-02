@@ -1,7 +1,7 @@
 // `withLunarCSS(config)` injects LunarCSS into a Metro config:
 //   1. Loads `lunar.config.ts` via jiti at config time (no CSS, no Babel).
 //   2. Flattens theme tokens and emits `<projectRoot>/.lunarcss/__theme__.js`.
-//   3. Routes the bare specifier `lunar-css/__theme__` to that emitted file
+//   3. Routes the bare specifier `@lunar-kit/css/__theme__` to that emitted file
 //      via Metro's `resolver.resolveRequest`, so the runtime imports the
 //      user's tokens automatically on app boot.
 //   4. Sets the babel transformer to LunarCSS's transformer and preserves
@@ -52,7 +52,7 @@ export interface WithLunarCSSOptions {
 }
 
 const UPSTREAM_ENV_KEY = 'LUNARCSS_UPSTREAM_TRANSFORMER'
-const VIRTUAL_SPECIFIER = 'lunar-css/__theme__'
+const VIRTUAL_SPECIFIER = '@lunar-kit/css/__theme__'
 const DEFAULT_UPSTREAM_HINTS = [
   '@react-native/metro-babel-transformer',
   'metro-react-native-babel-transformer',
@@ -102,7 +102,7 @@ export function withLunarCSS<T extends MetroConfigShape>(
   }
   transformer.babelTransformerPath = resolveTransformerPath()
 
-  // 4. Route `lunar-css/__theme__` to the generated file.
+  // 4. Route `@lunar-kit/css/__theme__` to the generated file.
   const userResolver = config.resolver ?? {}
   const previousResolveRequest = userResolver.resolveRequest
   const resolveRequest: ResolveRequestFn = (context, moduleName, platform) => {

@@ -22,7 +22,7 @@
     "outDir": "dist",
     "rootDir": "src",
     "paths": {
-      "lunar-css/__theme__": ["./src/__theme__.ts"]
+      "@lunar-kit/css/__theme__": ["./src/__theme__.ts"]
     }
   },
   "include": ["src/**/*"],

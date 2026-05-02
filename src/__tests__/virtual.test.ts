@@ -33,7 +33,7 @@ describe('generateThemeSource', () => {
 })
 
 describe('emitVirtualTheme', () => {
-  it('writes generated file under .lunar-css/__theme__.js', () => {
+  it('writes generated file under .@lunar-kit/css/__theme__.js', () => {
     const root = mkRoot()
     const result = emitVirtualTheme(root, { '--color-primary': '#6366f1' })
     expect(result.filepath).toMatch(/\.lunarcss[\\/]__theme__\.js$/)
