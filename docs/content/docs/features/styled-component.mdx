@@ -6,7 +6,7 @@ description: Wrap third-party RN components so they accept className and matchin
 The Metro transformer rewrites whitelisted RN intrinsics at build time with zero runtime cost. For everything else — `LinearGradient`, `BlurView`, design-system primitives — wrap with `styledComponent`:
 
 ```tsx
-import { styledComponent } from 'lunar-css'
+import { styledComponent } from '@lunar-kit/css'
 import { LinearGradient as _LinearGradient } from 'expo-linear-gradient'
 
 const LinearGradient = styledComponent(_LinearGradient)

@@ -60,14 +60,14 @@ module.exports = mergeConfig(config, {})
     )
     runInitBare({ projectRoot: root })
     const out = readFileSync(join(root, 'metro.config.js'), 'utf8')
-    expect(out).toMatch(/require\(['"]lunar-css\/metro['"]\)/)
+    expect(out).toMatch(/require\(['"]@lunar-kit\/css\/metro['"]\)/)
     expect(out).toMatch(/module\.exports\s*=\s*withLunarCSS\(/)
   })
 
   it('skips when already wrapped', () => {
     const root = mkRoot()
     const original = `const { getDefaultConfig } = require('@react-native/metro-config')
-const { withLunarCSS } = require('lunar-css/metro')
+const { withLunarCSS } = require('@lunar-kit/css/metro')
 module.exports = withLunarCSS(getDefaultConfig(__dirname))
 `
     writeFileSync(join(root, 'metro.config.js'), original)
@@ -95,7 +95,7 @@ describe('runInitBare (idempotent re-run)', () => {
       'unchanged',
     )
     const out = readFileSync(join(root, 'metro.config.js'), 'utf8')
-    expect(out.match(/lunar-css\/metro/g)?.length).toBe(1)
+    expect(out.match(/@lunar-kit\/css\/metro/g)?.length).toBe(1)
   })
 
   it('does not duplicate .gitignore section', () => {

@@ -78,7 +78,7 @@ describe('transformClassNames multi-style rewrites', () => {
       )
     `
     const out = transformClassNames({ src, filename: 'A.tsx' })
-    const importMatches = out.code.match(/from\s+["']lunar-css\/runtime["']/g)
+    const importMatches = out.code.match(/from\s+["']@lunar-kit\/css\/runtime["']/g)
     expect(importMatches?.length).toBe(1)
   })
 })

@@ -2,10 +2,10 @@
 // metro.config.js / .ts. AST-based per Risk #18 — never regex-append.
 //
 // Two operations performed if (and only if) not already present:
-//   1. Add `const { withLunarCSS } = require('lunar-css/metro')` near the top.
+//   1. Add `const { withLunarCSS } = require('@lunar-kit/css/metro')` near the top.
 //   2. Wrap the right-hand side of `module.exports = X` with `withLunarCSS(X)`.
 //
-// If the file already references `lunar-css/metro`, the merge is skipped and
+// If the file already references `@lunar-kit/css/metro`, the merge is skipped and
 // the file is reported as `unchanged`.
 
 import { parse } from '@babel/parser'
@@ -32,7 +32,7 @@ export interface MergeResult {
 }
 
 export function mergeMetroConfig(source: string): MergeResult {
-  if (source.includes('lunar-css/metro')) {
+  if (source.includes('@lunar-kit/css/metro')) {
     return { changed: false, reason: 'already-wired', code: source }
   }
 
@@ -104,7 +104,7 @@ export function mergeMetroConfig(source: string): MergeResult {
           true,
         ),
       ]),
-      t.callExpression(t.identifier('require'), [t.stringLiteral('lunar-css/metro')]),
+      t.callExpression(t.identifier('require'), [t.stringLiteral('@lunar-kit/css/metro')]),
     ),
   ])
   program.body.splice(insertAt, 0, requireDecl)

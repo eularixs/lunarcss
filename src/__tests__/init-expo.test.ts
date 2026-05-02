@@ -64,7 +64,7 @@ describe('runInitExpo (idempotent re-run)', () => {
     const out = readFileSync(join(root, 'metro.config.js'), 'utf8')
     const occurrences = out.match(/withLunarCSS/g)?.length ?? 0
     expect(occurrences).toBeGreaterThanOrEqual(1)
-    expect(out.match(/lunar-css\/metro/g)?.length).toBe(1)
+    expect(out.match(/@lunar-kit\/css\/metro/g)?.length).toBe(1)
   })
 
   it('does not duplicate .gitignore section on re-run', () => {
@@ -88,7 +88,7 @@ module.exports = config
     )
     runInitExpo({ projectRoot: root })
     const out = readFileSync(join(root, 'metro.config.js'), 'utf8')
-    expect(out).toMatch(/require\(['"]lunar-css\/metro['"]\)/)
+    expect(out).toMatch(/require\(['"]@lunar-kit\/css\/metro['"]\)/)
     expect(out).toMatch(/module\.exports\s*=\s*withLunarCSS\(\s*config\s*\)/)
   })
 
@@ -107,13 +107,13 @@ module.exports = config
     const out = readFileSync(join(root, 'metro.config.js'), 'utf8')
     expect(out).toMatch(/require\(['"]node:path['"]\)/)
     expect(out).toMatch(/config\.resolver\.assetExts\.push\(['"]lottie['"]\)/)
-    expect(out).toMatch(/require\(['"]lunar-css\/metro['"]\)/)
+    expect(out).toMatch(/require\(['"]@lunar-kit\/css\/metro['"]\)/)
   })
 
   it('skips when already wrapped', () => {
     const root = mkRoot()
     const original = `const { getDefaultConfig } = require('expo/metro-config')
-const { withLunarCSS } = require('lunar-css/metro')
+const { withLunarCSS } = require('@lunar-kit/css/metro')
 module.exports = withLunarCSS(getDefaultConfig(__dirname))
 `
     writeFileSync(join(root, 'metro.config.js'), original)
@@ -123,7 +123,7 @@ module.exports = withLunarCSS(getDefaultConfig(__dirname))
 })
 
 describe('runInitExpo (tsconfig types augmentation)', () => {
-  it('appends lunar-css/types to compilerOptions.types', () => {
+  it('appends @lunar-kit/css/types to compilerOptions.types', () => {
     const root = mkRoot()
     writeFileSync(
       join(root, 'tsconfig.json'),
@@ -132,14 +132,14 @@ describe('runInitExpo (tsconfig types augmentation)', () => {
     runInitExpo({ projectRoot: root })
     const json = JSON.parse(readFileSync(join(root, 'tsconfig.json'), 'utf8'))
     expect(json.compilerOptions.types).toContain('expo/types')
-    expect(json.compilerOptions.types).toContain('lunar-css/types')
+    expect(json.compilerOptions.types).toContain('@lunar-kit/css/types')
   })
 
   it('skips when already present', () => {
     const root = mkRoot()
     writeFileSync(
       join(root, 'tsconfig.json'),
-      JSON.stringify({ compilerOptions: { types: ['lunar-css/types'] } }, null, 2),
+      JSON.stringify({ compilerOptions: { types: ['@lunar-kit/css/types'] } }, null, 2),
     )
     runInitExpo({ projectRoot: root })
     const before = readFileSync(join(root, 'tsconfig.json'), 'utf8')
@@ -149,8 +149,8 @@ describe('runInitExpo (tsconfig types augmentation)', () => {
 })
 
 describe('mergeMetroConfig (unit)', () => {
-  it('reports already-wired when source contains lunar-css/metro', () => {
-    const out = mergeMetroConfig(`require('lunar-css/metro')`)
+  it('reports already-wired when source contains @lunar-kit/css/metro', () => {
+    const out = mergeMetroConfig(`require('@lunar-kit/css/metro')`)
     expect(out.changed).toBe(false)
     expect(out.reason).toBe('already-wired')
   })

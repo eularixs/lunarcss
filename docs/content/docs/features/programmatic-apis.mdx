@@ -10,7 +10,7 @@ For values you cannot pass through JSX `className` — StatusBar tints, navigati
 Returns a singleton with two methods:
 
 ```tsx
-import { useLunarCSS } from 'lunar-css'
+import { useLunarCSS } from '@lunar-kit/css'
 
 function Screen() {
   const { tw, token } = useLunarCSS()
@@ -33,7 +33,7 @@ The hook does NOT subscribe to theme-change events. Token mutations between rend
 Typed Proxy backed by the live token registry:
 
 ```tsx
-import { vars } from 'lunar-css'
+import { vars } from '@lunar-kit/css'
 
 vars.primary  // "#6366f1"
 vars.accent   // "#f59e0b"
@@ -48,7 +48,7 @@ vars['--color-primary']  // "#6366f1"  — fully-qualified bypasses the chain
 Map logical names to resolved token values. Useful for libraries that take a flat theme object (React Navigation, Reanimated, charts):
 
 ```tsx
-import { lunarTheme } from 'lunar-css'
+import { lunarTheme } from '@lunar-kit/css'
 import { ThemeProvider } from '@react-navigation/native'
 
 const NavTheme = {
@@ -70,4 +70,4 @@ Each spec value can be a fully-qualified CSS variable (`--color-...`) or a bare 
 
 ## Web parity
 
-All three APIs read the same global registry. The web bundle's runtime hydrates the registry from `lunar-css/__theme__` exactly like native, so `vars.primary` returns `"#6366f1"` on both platforms — no Tailwind dependency, no DOM-side custom-property lookup.
+All three APIs read the same global registry. The web bundle's runtime hydrates the registry from `@lunar-kit/css/__theme__` exactly like native, so `vars.primary` returns `"#6366f1"` on both platforms — no Tailwind dependency, no DOM-side custom-property lookup.

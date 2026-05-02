@@ -1,6 +1,6 @@
 // Native / default entry. Re-exports the public API. Boot-time hydration
 // (initNativeBridge + setTokens(THEME_TOKENS)) lives in ./runtime/tw.ts so
-// transformer-injected `import { __lcssTw } from 'lunar-css/runtime'` triggers
+// transformer-injected `import { __lcssTw } from '@lunar-kit/css/runtime'` triggers
 // it on its own — user apps don't need to import the root entry.
 export { __lcssTw, tw } from './runtime/tw.js'
 export { styledComponent } from './runtime/styled.js'

@@ -8,7 +8,7 @@ description: Adding className support to React Native components via type augmen
 ```json
 {
   "compilerOptions": {
-    "types": ["lunar-css/types"]
+    "types": ["@lunar-kit/css/types"]
   }
 }
 ```
@@ -32,7 +32,7 @@ LunarCSS augments the `ViewProps`, `TextProps`, `TextInputProps`, `ImageProps`, 
 | `SectionList` | `SectionListProps` |
 | `Modal` | `ModalProps` |
 
-After adding `"lunar-css/types"`, TypeScript accepts `className` on all these components:
+After adding `"@lunar-kit/css/types"`, TypeScript accepts `className` on all these components:
 
 ```tsx
 import { View, Text } from 'react-native'
@@ -44,7 +44,7 @@ import { View, Text } from 'react-native'
 
 ## Without the types
 
-Without `"lunar-css/types"` in `tsconfig.json`, TypeScript will error:
+Without `"@lunar-kit/css/types"` in `tsconfig.json`, TypeScript will error:
 
 ```
 Property 'className' does not exist on type 'IntrinsicAttributes & ViewProps'
@@ -71,7 +71,7 @@ export function Card({ className, ...rest }: CardProps) {
 Use for typed config in helper utilities:
 
 ```ts
-import type { LunarConfig } from 'lunar-css'
+import type { LunarConfig } from '@lunar-kit/css'
 
 function buildTheme(config: LunarConfig) {
   // ...
@@ -83,7 +83,7 @@ function buildTheme(config: LunarConfig) {
 For typed `theme.extend` objects:
 
 ```ts
-import type { ThemeExtend } from 'lunar-css'
+import type { ThemeExtend } from '@lunar-kit/css'
 
 const myTokens: ThemeExtend = {
   colors: { primary: '#6366f1' },

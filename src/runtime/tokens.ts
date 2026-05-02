@@ -2,7 +2,7 @@ export type TokenMap = Record<string, string>
 
 // tsup builds each entry (index.js, runtime/tw.js, ...) without code splitting,
 // so a top-level `const tokens = {}` produces a SEPARATE registry per entry.
-// The transformer-injected `import 'lunar-css/runtime'` would then hydrate the
+// The transformer-injected `import '@lunar-kit/css/runtime'` would then hydrate the
 // runtime/tw.js copy while consumer-facing getToken/getAllTokens (re-exported
 // from index.js) read a different empty copy. Pin to globalThis so all bundle
 // copies share the same Map.

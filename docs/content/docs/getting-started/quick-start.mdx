@@ -15,8 +15,8 @@ Generated files:
 ```
 lunar.config.ts        # token source of truth
 metro.config.js        # withLunarCSS wrapped
-.gitignore             # .lunar-css/ ignored
-tsconfig.json          # types: ["lunar-css/types"] appended
+.gitignore             # .@lunar-kit/css/ ignored
+tsconfig.json          # types: ["@lunar-kit/css/types"] appended
 ```
 
 Use `className` immediately:
@@ -52,7 +52,7 @@ Generated files:
 
 ```
 lunar.config.ts
-app/globals.css        # @import "tailwindcss" + @plugin "lunar-css"
+app/globals.css        # @import "tailwindcss" + @plugin "@lunar-kit/css"
 .gitignore
 tsconfig.json
 ```
@@ -63,7 +63,7 @@ Add the PostCSS plugin to `postcss.config.js`:
 module.exports = {
   plugins: {
     '@tailwindcss/postcss': {},
-    'lunar-css': {},
+    '@lunar-kit/css': {},
   },
 }
 ```
@@ -108,7 +108,7 @@ Same files as Expo, but `metro.config.js` uses `@react-native/metro-config` + `m
 
 ```js
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config')
-const { withLunarCSS } = require('lunar-css/metro')
+const { withLunarCSS } = require('@lunar-kit/css/metro')
 
 const config = {}
 module.exports = withLunarCSS(mergeConfig(getDefaultConfig(__dirname), config))
@@ -127,7 +127,7 @@ If you prefer to wire things manually:
 
 ```js
 const { getDefaultConfig } = require('expo/metro-config')
-const { withLunarCSS } = require('lunar-css/metro')
+const { withLunarCSS } = require('@lunar-kit/css/metro')
 
 const config = getDefaultConfig(__dirname)
 module.exports = withLunarCSS(config)
@@ -136,7 +136,7 @@ module.exports = withLunarCSS(config)
 3. Add types to `tsconfig.json`:
 
 ```json
-{ "compilerOptions": { "types": ["lunar-css/types"] } }
+{ "compilerOptions": { "types": ["@lunar-kit/css/types"] } }
 ```
 
 ### Web
@@ -148,7 +148,7 @@ module.exports = withLunarCSS(config)
 module.exports = {
   plugins: {
     '@tailwindcss/postcss': {},
-    'lunar-css': {},
+    '@lunar-kit/css': {},
   },
 }
 ```
@@ -157,5 +157,5 @@ module.exports = {
 
 ```css
 @import "tailwindcss";
-@plugin "lunar-css";
+@plugin "@lunar-kit/css";
 ```

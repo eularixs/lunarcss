@@ -34,12 +34,12 @@ First public release.
 **OKLCH → sRGB conversion** via `culori` for wide-gamut colors on mobile with out-of-gamut dev warning
 
 **Metro integration**
-- `withLunarCSS(config)` — wraps Metro config; loads `lunar.config.ts` via jiti, flattens tokens, emits `.lunar-css/__theme__.js` (content-hash delta check)
-- `resolveRequest` interceptor routes bare specifier `lunar-css/__theme__` to generated virtual module
-- Metro transformer (`lunar-css/metro/transformer`) — AST-based className → `__lcssTw()` call, only for RN intrinsic elements, co-exists with any upstream transformer via `LUNARCSS_UPSTREAM_TRANSFORMER` env
+- `withLunarCSS(config)` — wraps Metro config; loads `lunar.config.ts` via jiti, flattens tokens, emits `.@lunar-kit/css/__theme__.js` (content-hash delta check)
+- `resolveRequest` interceptor routes bare specifier `@lunar-kit/css/__theme__` to generated virtual module
+- Metro transformer (`@lunar-kit/css/metro/transformer`) — AST-based className → `__lcssTw()` call, only for RN intrinsic elements, co-exists with any upstream transformer via `LUNARCSS_UPSTREAM_TRANSFORMER` env
 - `__theme__.ts` stub for non-Metro environments (tests, web SSR)
 
-**PostCSS web plugin** (`lunar-css/web/plugin`)
+**PostCSS web plugin** (`@lunar-kit/css/web/plugin`)
 - Reads `lunar.config.ts` via jiti (no module cache) and emits `@theme { ... }` block before `@import "tailwindcss"`
 - `shouldRunOn()` heuristic limits injection to entry CSS files
 - Idempotent via `/* lunarcss:emitted */` marker comment
@@ -63,4 +63,4 @@ First public release.
 
 **Test suite** — 240 tests across all modules (vitest)
 
-[0.1.0]: https://github.com/eularix/lunar-css/releases/tag/v0.1.0
+[0.1.0]: https://github.com/eularix/@lunar-kit/css/releases/tag/v0.1.0

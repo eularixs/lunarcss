@@ -23,11 +23,11 @@
 ## Install
 
 ```bash
-pnpm add lunar-css
+pnpm add @lunar-kit/css
 # or
-npm install lunar-css
+npm install @lunar-kit/css
 # or
-yarn add lunar-css
+yarn add @lunar-kit/css
 ```
 
 Peer dependencies (auto-install or already present):
@@ -52,8 +52,8 @@ Generates:
 ```
 lunar.config.ts        # token source of truth
 metro.config.js        # withLunarCSS wrapped (or merged into existing)
-.gitignore             # .lunar-css/ ignored
-tsconfig.json          # types: ["lunar-css/types"] appended
+.gitignore             # .@lunar-kit/css/ ignored
+tsconfig.json          # types: ["@lunar-kit/css/types"] appended
 ```
 
 Use `className` on any RN component:
@@ -90,7 +90,7 @@ Generates:
 
 ```
 lunar.config.ts        # same template as native
-app/globals.css        # @import "tailwindcss" + @plugin "lunar-css"
+app/globals.css        # @import "tailwindcss" + @plugin "@lunar-kit/css"
 .gitignore
 tsconfig.json
 ```
@@ -101,12 +101,12 @@ Add the PostCSS plugin to `postcss.config.js`:
 module.exports = {
   plugins: {
     '@tailwindcss/postcss': {},
-    'lunar-css': {},
+    '@lunar-kit/css': {},
   },
 }
 ```
 
-(Or use `lunar-css/web/plugin` directly — see [Web Plugin](#web-plugin).)
+(Or use `@lunar-kit/css/web/plugin` directly — see [Web Plugin](#web-plugin).)
 
 Import `app/globals.css` from your root layout:
 
@@ -178,7 +178,7 @@ For third-party components NOT in the whitelist (LinearGradient, BlurView,
 your own design-system primitives), wrap with `styledComponent`:
 
 ```tsx
-import { styledComponent } from 'lunar-css'
+import { styledComponent } from '@lunar-kit/css'
 import { LinearGradient as _LinearGradient } from 'expo-linear-gradient'
 
 const LinearGradient = styledComponent(_LinearGradient)
@@ -215,7 +215,7 @@ themes, animated values), use:
 ### `useLunarCSS()`
 
 ```tsx
-import { useLunarCSS } from 'lunar-css'
+import { useLunarCSS } from '@lunar-kit/css'
 
 function Screen() {
   const { tw, token } = useLunarCSS()
@@ -233,7 +233,7 @@ function Screen() {
 Typed token accessor backed by the live registry:
 
 ```tsx
-import { vars } from 'lunar-css'
+import { vars } from '@lunar-kit/css'
 
 vars.primary  // "#6366f1"
 vars.accent   // "#f59e0b"
@@ -246,7 +246,7 @@ Map logical names to resolved token values. Useful for libraries that take
 theme objects (React Navigation, Reanimated, etc.):
 
 ```tsx
-import { lunarTheme } from 'lunar-css'
+import { lunarTheme } from '@lunar-kit/css'
 import { ThemeProvider } from '@react-navigation/native'
 
 const NavTheme = {
@@ -271,7 +271,7 @@ const NavTheme = {
 Single source of truth. Read by Metro at config time on native, by PostCSS at build time on web.
 
 ```ts
-import { defineConfig } from 'lunar-css'
+import { defineConfig } from '@lunar-kit/css'
 
 export default defineConfig({
   theme: {
@@ -374,7 +374,7 @@ Output:
 
 ```js
 const { getDefaultConfig } = require('expo/metro-config');
-const { withLunarCSS } = require('lunar-css/metro');
+const { withLunarCSS } = require('@lunar-kit/css/metro');
 const config = getDefaultConfig(__dirname);
 config.resolver.assetExts.push('lottie');
 module.exports = withLunarCSS(config);
@@ -386,11 +386,11 @@ Existing user code preserved — only the wrap + import are added.
 
 ## Web Plugin
 
-The `lunar-css/web/plugin` PostCSS plugin reads `lunar.config.ts` at build time and emits an `@theme {}` block before `@import "tailwindcss"`.
+The `@lunar-kit/css/web/plugin` PostCSS plugin reads `lunar.config.ts` at build time and emits an `@theme {}` block before `@import "tailwindcss"`.
 
 ```js
 // postcss.config.js
-const lunarcss = require('lunar-css/web/plugin')
+const lunarcss = require('@lunar-kit/css/web/plugin')
 
 module.exports = {
   plugins: [
@@ -417,7 +417,7 @@ Input:
 ```css
 /* LunarCSS */
 @import "tailwindcss";
-@plugin "lunar-css";
+@plugin "@lunar-kit/css";
 ```
 
 Output (with `colors.primary = '#6366f1'`, `spacing.xs = '4px'`):
@@ -430,7 +430,7 @@ Output (with `colors.primary = '#6366f1'`, `spacing.xs = '4px'`):
   --spacing-xs: 4px
 }
 @import "tailwindcss";
-@plugin "lunar-css";
+@plugin "@lunar-kit/css";
 ```
 
 ### Hot-reload

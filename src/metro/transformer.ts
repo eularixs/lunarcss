@@ -3,7 +3,7 @@
 // then delegates to the user's upstream transformer (default @react-native/metro-babel-transformer).
 //
 // `babelTransformerPath` in metro.config.js must point to the built file:
-//   require.resolve('lunar-css/metro/transformer')
+//   require.resolve('@lunar-kit/css/metro/transformer')
 
 import { createRequire } from 'node:module'
 import { transformClassNames } from './transform-classnames.js'

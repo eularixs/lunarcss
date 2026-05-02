@@ -4,7 +4,7 @@
 export const METRO_CONFIG_BARE_DEFAULT = `// LunarCSS-managed Metro config. Edit freely; \`lunarcss init\` will not
 // overwrite this file once it exists.
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config')
-const { withLunarCSS } = require('lunar-css/metro')
+const { withLunarCSS } = require('@lunar-kit/css/metro')
 
 const defaultConfig = getDefaultConfig(__dirname)
 
