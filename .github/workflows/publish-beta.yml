@@ -109,11 +109,27 @@ jobs:
           NEW_VERSION: ${{ steps.bump.outputs.new_version }}
         run: |
           git add package.json
-          git commit -m "chore: release v${NEW_VERSION}"
-          git tag "v${NEW_VERSION}"
+          git commit -m "chore: release ${NEW_VERSION}"
+          # Tag name matches the npm version exactly (no `v` prefix). Aligns
+          # `git ls-remote --tags` output with `npm view @lunar-kit/css versions`.
+          git tag "${NEW_VERSION}"
           git push origin dev --follow-tags
+          echo "::notice title=Tag pushed::${NEW_VERSION} pushed to origin/dev"
 
       - name: Publish beta to npm
         run: npm publish --tag beta --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Create a GitHub Release marked `prerelease: true`. Beta releases stay
+      # out of the "Latest release" pin on the repo home page; users opting in
+      # see them under the All Releases tab.
+      - name: Create GitHub Pre-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.bump.outputs.new_version }}
+          name: ${{ steps.bump.outputs.new_version }}
+          generate_release_notes: true
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

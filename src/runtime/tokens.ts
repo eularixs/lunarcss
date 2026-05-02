@@ -23,6 +23,19 @@ export function setTokens(next: TokenMap): void {
   state.themeHash++
 }
 
+// Replace the registry wholesale: clears every existing key, then sets the
+// next map. Use this when the source of truth (lunar.config.ts) is being
+// re-applied — e.g. on Metro hot-reload — so deletions in the user's config
+// surface at runtime instead of leaving stale entries behind.
+export function replaceTokens(next: TokenMap): void {
+  for (const k of Object.keys(tokens)) delete tokens[k]
+  for (const k of Object.keys(next)) {
+    const v = next[k]
+    if (v !== undefined) tokens[k] = v
+  }
+  state.themeHash++
+}
+
 export function clearTokens(): void {
   for (const k of Object.keys(tokens)) delete tokens[k]
   state.themeHash++

@@ -7,18 +7,18 @@ description: Planned features for the v0.3.0 release.
 
 v0.3.0 focuses on developer experience improvements: hot-reload for `lunar.config.ts` on native, docs site polish, and ecosystem integrations.
 
-## Native hot-reload for `lunar.config.ts`
+## Native hot-reload for `lunar.config.ts` — shipped
 
-Currently, editing `lunar.config.ts` on native requires a Metro restart. v0.3.0 aims to make token changes hot-reloadable:
+Editing `lunar.config.ts` no longer requires a Metro restart.
 
-**Approach**: content-hash polling via Metro's file watcher API. When `lunar.config.ts` changes:
-1. Metro detects the change via `watchFolders`
-2. `withLunarCSS` re-runs `loadLunarConfig` + `flattenTokens`
-3. Compares SHA-1 hash of new tokens against previous
-4. If changed: rewrites `.@lunar-kit/css/__theme__.js`, calls `invalidateTokens()` to clear the LRU cache
-5. Fast Refresh picks up the change — no full Metro restart
+**How it works**:
+1. `withLunarCSS` registers an `fs.watch` on the config file's parent directory at Metro startup. Watching the dir (not the file) survives editor atomic-rename saves (Vim, etc.).
+2. On change, `loadLunarConfig` + `flattenTokens` re-run; `emitVirtualTheme` content-hashes the result and only rewrites `.lunarcss/__theme__.js` if the tokens actually differ.
+3. Metro's existing `watchFolders` includes the project root, so its bundler watcher detects the rewrite and Fast Refresh propagates the new module to clients.
+4. `runtime/tw.ts`'s boot path uses `replaceTokens(THEME_TOKENS)` — wholesale swap, NOT additive merge — so deletions in the config surface at runtime instead of leaving stale entries. The theme hash bumps; the LRU cache entries become unreachable and get recomputed against the new map.
+5. Malformed-config edits (mid-typing) don't crash Metro — the watcher catches `loadLunarConfig` errors and logs a warning; the next save recovers.
 
-The web path already has hot-reload via PostCSS dependency messages.
+The web path's hot-reload via PostCSS dependency messages was already in place; the Metro-side watcher mirrors it.
 
 ## Docs site polish
 
@@ -45,4 +45,4 @@ The Tailwind v3 named color palette ships in v0.2.0 as a fallback inside the v4 
 
 ## Status
 
-Planned. Timelines and scope subject to change. Follow [GitHub Releases](https://github.com/eularix/@lunar-kit/css/releases) or watch the repo.
+Planned. Timelines and scope subject to change. Follow [GitHub Releases](https://github.com/eularixs/lunarcss/releases) or watch the repo.

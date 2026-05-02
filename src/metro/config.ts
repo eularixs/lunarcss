@@ -11,8 +11,9 @@
 //      requires a Metro restart in this iteration; full content-hash
 //      invalidation is Risk #12 follow-up).
 
+import { watch as watchFile } from 'node:fs'
 import { createRequire } from 'node:module'
-import { dirname, join, resolve } from 'node:path'
+import { basename, dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { loadLunarConfig } from '../config/load.js'
 import { flattenTokens } from '../config/flatten.js'
@@ -116,10 +117,24 @@ export function withLunarCSS<T extends MetroConfigShape>(
   }
 
   // 5. Watch project root so Metro picks up the generated file + future edits
-  //    to lunar.config.ts. (Full hot invalidation = Risk #12 follow-up.)
+  //    to lunar.config.ts.
   const watchFolders = [...(config.watchFolders ?? [])]
   if (loaded && !watchFolders.includes(dirname(loaded.filepath))) {
     watchFolders.push(dirname(loaded.filepath))
+  }
+
+  // 6. Hot-reload lunar.config.ts on edit. Re-loads + re-flattens + re-emits
+  //    .lunarcss/__theme__.js. Metro's watcher (because the project root is in
+  //    watchFolders) detects the rewrite and Fast Refresh propagates the new
+  //    THEME_TOKENS through `runtime/tw.ts`'s setTokens() boot — no Metro
+  //    restart required.
+  //
+  //    We watch the parent directory (not the file itself) so atomic-rename
+  //    saves from editors like Vim's `:w` survive — file-level watches break
+  //    when the inode replaces. `persistent: false` keeps the watcher from
+  //    holding the Metro process alive past its natural exit.
+  if (loaded?.filepath) {
+    setupHotReload(loaded.filepath, projectRoot)
   }
 
   return {
@@ -130,5 +145,49 @@ export function withLunarCSS<T extends MetroConfigShape>(
       resolveRequest,
     },
     watchFolders,
+  }
+}
+
+const HOT_RELOAD_DEBOUNCE_MS = 50
+
+// Reload + re-emit .lunarcss/__theme__.js whenever lunar.config.ts changes.
+// Idempotent: a single watcher per process; subsequent withLunarCSS calls
+// (e.g. nested config compositions) reuse the established watcher.
+const watched = new Set<string>()
+function setupHotReload(configFile: string, projectRoot: string): void {
+  if (watched.has(configFile)) return
+  watched.add(configFile)
+
+  const cfgDir = dirname(configFile)
+  const cfgBase = basename(configFile)
+  let pending = false
+
+  try {
+    const watcher = watchFile(cfgDir, { persistent: false }, (_event, filename) => {
+      // `filename` may be null on some platforms; only act on our target name.
+      if (filename && filename !== cfgBase) return
+      if (pending) return
+      pending = true
+      setTimeout(() => {
+        pending = false
+        try {
+          const reloaded = loadLunarConfig(configFile)
+          if (!reloaded) return
+          const newTokens = flattenTokens(reloaded.config)
+          emitVirtualTheme(projectRoot, newTokens)
+        } catch (err) {
+          // Don't crash Metro — malformed config during edit is expected
+          // (typing) and the next save will recover.
+          // eslint-disable-next-line no-console
+          console.error('[lunar-css] hot-reload failed:', err)
+        }
+      }, HOT_RELOAD_DEBOUNCE_MS)
+    })
+    watcher.unref?.()
+  } catch (err) {
+    // fs.watch can throw on platforms without inotify (rare). Swallow — user
+    // falls back to manual restart, no behavior regression vs pre-hot-reload.
+    // eslint-disable-next-line no-console
+    console.warn('[lunar-css] hot-reload watcher disabled:', err)
   }
 }
