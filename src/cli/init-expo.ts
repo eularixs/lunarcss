@@ -76,5 +76,9 @@ export function runInitExpo(options: InitExpoOptions): InitExpoReport {
     if (ref) steps.push(ref)
   }
 
+  warnings.push(
+    'Restart Metro with cache cleared so the transformer loads: `npx expo start --clear`.',
+  )
+
   return { steps, warnings }
 }

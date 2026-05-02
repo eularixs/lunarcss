@@ -7,7 +7,7 @@ description: Current limitations in v0.1.0 and their planned status.
 
 | Limitation | Status | Notes |
 | :-- | :-- | :-- |
-| Hot-reload of `lunar.config.ts` on native | Metro restart required | PostCSS hot-reload works on web. Native content-hash invalidation planned for v0.3.0. |
+| First-install Metro cache | Restart with `--clear` once after `npx lunar-css init` | Metro caches files transformed before the LunarCSS transformer was wired. Subsequent edits (including `lunar.config.ts` token tweaks) hot-reload normally — see [Metro integration](../integrations/metro). `lunar-css init` warns about this in its output. |
 | Container queries on mobile | Silently dropped | Not supported by React Native. `@container` and `@*:` modifiers are no-ops on native — no crash, no warning. |
 | OKLCH on mobile | Clamped to nearest sRGB | Wide-gamut values lose chroma. `culori` converts at resolver time. Dev warning emitted when clamping occurs. Use sRGB-safe OKLCH or a hex fallback for precision. |
 | Keyframe `animate-*` classes (`animate-spin`, `animate-pulse`, ...) | Out of scope | Drive Reanimated `withTiming` / `withSpring` directly. The `transition-*` / `duration-*` / `ease-*` / `delay-*` utilities ship and emit RN-Web-compatible CSS time strings — see `example/app/(tabs)/motion.tsx`. |
@@ -71,4 +71,4 @@ import { __lcssTw } from '@lunar-kit/css/runtime'
 
 ## Reporting issues
 
-Found a limitation not listed here? [Open an issue](https://github.com/eularix/@lunar-kit/css/issues).
+Found a limitation not listed here? [Open an issue](https://github.com/eularixs/lunarcss/issues).

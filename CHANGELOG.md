@@ -63,4 +63,4 @@ First public release.
 
 **Test suite** — 240 tests across all modules (vitest)
 
-[0.1.0]: https://github.com/eularix/@lunar-kit/css/releases/tag/v0.1.0
+[0.1.0]: https://github.com/eularixs/lunarcss/releases/tag/v0.1.0

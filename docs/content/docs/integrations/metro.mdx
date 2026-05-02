@@ -8,7 +8,7 @@ description: How LunarCSS wires into Metro for React Native and Expo.
 `withLunarCSS(config)` wraps your Metro config and adds three things:
 
 1. **Reads `lunar.config.ts`** — via `jiti` (no CSS parsing, pure TS evaluation)
-2. **Emits `.@lunar-kit/css/__theme__.js`** — a frozen JS object of flattened token key→value pairs. Content-hash delta checked — only rewritten when tokens change
+2. **Emits `.lunarcss/__theme__.js`** — a frozen JS object of flattened token key→value pairs. Content-hash delta checked — only rewritten when tokens change
 3. **Routes `@lunar-kit/css/__theme__`** — adds a `resolveRequest` interceptor that redirects the bare specifier to the generated file
 
 ## Setup
@@ -50,8 +50,8 @@ setTokens(THEME_TOKENS)
 
 On native:
 - Metro's `resolveRequest` intercepts `'@lunar-kit/css/__theme__'`
-- Routes to `.@lunar-kit/css/__theme__.js` in the project root
-- `.@lunar-kit/css/__theme__.js` contains `export const THEME_TOKENS = Object.freeze({ '--color-primary': '#6366f1', ... })`
+- Routes to `.lunarcss/__theme__.js` in the project root
+- `.lunarcss/__theme__.js` contains `export const THEME_TOKENS = Object.freeze({ '--color-primary': '#6366f1', ... })`
 
 On non-Metro environments (tests, web):
 - The bare specifier resolves to `src/__theme__.ts` — an empty `Object.freeze({})` stub
@@ -73,13 +73,13 @@ The upstream transformer is discovered from the previous `babelTransformerPath` 
 
 Reanimated's Babel plugin rewrites JSX at the Babel stage. If LunarCSS also rewrites JSX at the Babel stage, the two plugins conflict and Reanimated breaks. By operating at Metro's transformer layer (after Babel), LunarCSS avoids the entire conflict.
 
-## `.@lunar-kit/css/` directory
+## `.lunarcss/` directory
 
-LunarCSS writes generated files to `.@lunar-kit/css/` at the project root. Add it to `.gitignore`:
+LunarCSS writes generated files to `.lunarcss/` at the project root. Add it to `.gitignore`:
 
 ```
 # LunarCSS
-.@lunar-kit/css/
+.lunarcss/
 ```
 
 `lunar-css init` adds this automatically.

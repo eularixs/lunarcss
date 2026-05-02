@@ -74,5 +74,9 @@ export function runInitBare(options: InitBareOptions): InitBareReport {
     if (ref) steps.push(ref)
   }
 
+  warnings.push(
+    'Restart Metro with cache cleared so the transformer loads: `npx react-native start --reset-cache`.',
+  )
+
   return { steps, warnings }
 }

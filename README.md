@@ -52,7 +52,7 @@ Generates:
 ```
 lunar.config.ts        # token source of truth
 metro.config.js        # withLunarCSS wrapped (or merged into existing)
-.gitignore             # .@lunar-kit/css/ ignored
+.gitignore             # .lunarcss/ ignored
 tsconfig.json          # types: ["@lunar-kit/css/types"] appended
 ```
 
