@@ -6,11 +6,11 @@ description: Install LunarCSS and its peer dependencies.
 ## Install
 
 ```bash
-pnpm add lunarcss
+pnpm add lunar-css
 # or
-npm install lunarcss
+npm install lunar-css
 # or
-yarn add lunarcss
+yarn add lunar-css
 ```
 
 ## Peer dependencies
@@ -30,17 +30,17 @@ Add LunarCSS's `className` augmentations to your `tsconfig.json`:
 ```json
 {
   "compilerOptions": {
-    "types": ["lunarcss/types"]
+    "types": ["lunar-css/types"]
   }
 }
 ```
 
-The `lunarcss init` CLI does this automatically. If you're adding manually, append `"lunarcss/types"` to the existing `types` array.
+The `lunar-css init` CLI does this automatically. If you're adding manually, append `"lunar-css/types"` to the existing `types` array.
 
 ## What gets installed
 
 ```
-lunarcss/               ← core package
+lunar-css/               ← core package
   dist/
     index.js            ← mobile runtime (resolveClassList, tw())
     index.web.js        ← web passthrough stub
@@ -50,7 +50,7 @@ lunarcss/               ← core package
     web/
       plugin.js         ← PostCSS plugin
     cli/
-      index.js          ← npx lunarcss init
+      index.js          ← npx lunar-css init
     runtime/
       tw.js             ← __lcssTw() runtime helper
     __theme__.js        ← empty stub (populated by Metro at build time)

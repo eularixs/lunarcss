@@ -186,6 +186,11 @@ describe('transforms utility', () => {
     expect(resolveTransforms('transform-none')!.style).toEqual({ transform: [] })
   })
 
+  // bare transform
+  it('transform → empty array (Tailwind enable-flag, no-op on RN)', () => {
+    expect(resolveTransforms('transform')!.style).toEqual({ transform: [] })
+  })
+
   it('returns null for unknown', () => {
     expect(resolveTransforms('flip-x-4')).toBeNull()
   })

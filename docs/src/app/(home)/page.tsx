@@ -119,8 +119,8 @@ export default function HomePage() {
         </div>
         <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-7 text-center">
           <div className="flex flex-wrap items-center justify-center gap-2">
-            <Badge label="tests" value="240 passing" color="text-green-500" />
-            <Badge label="core" value="9.18 kb gzip" color="text-blue-500" />
+            <Badge label="tests" value="306 passing" color="text-green-500" />
+            <Badge label="core" value="11.17 kb gzip" color="text-blue-500" />
             <Badge label="license" value="MIT" color="text-fd-foreground" />
           </div>
           <h1 className="bg-gradient-to-br from-fd-foreground to-fd-foreground/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-6xl">
@@ -247,12 +247,12 @@ export default function HomePage() {
           </div>
           <pre className="mb-3 overflow-x-auto rounded-lg border border-fd-border bg-fd-card p-4 text-sm">
             <code className="text-fd-foreground">
-              <span className="text-fd-muted-foreground">$</span> pnpm add lunarcss
+              <span className="text-fd-muted-foreground">$</span> pnpm add lunar-css
             </code>
           </pre>
           <pre className="mb-6 overflow-x-auto rounded-lg border border-fd-border bg-fd-card p-4 text-sm">
             <code className="text-fd-foreground">
-              <span className="text-fd-muted-foreground">$</span> npx lunarcss init
+              <span className="text-fd-muted-foreground">$</span> npx lunar-css init
             </code>
           </pre>
           <pre className="overflow-x-auto rounded-xl border border-fd-border bg-fd-card p-6 text-sm leading-relaxed shadow-sm">

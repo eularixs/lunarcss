@@ -7,8 +7,17 @@ import {
   ensureGitignore,
   ensureLunarConfig,
   ensureTsconfigTypes,
+  ensureTypesReference,
   type InitStep,
 } from './init-shared.js'
+
+const BARE_ENTRY_CANDIDATES = [
+  'index.ts',
+  'index.tsx',
+  'index.js',
+  'App.tsx',
+  'App.ts',
+] as const
 
 export interface InitBareOptions {
   projectRoot: string
@@ -34,7 +43,7 @@ export function runInitBare(options: InitBareOptions): InitBareReport {
     if (merge.reason === 'no-module-exports') {
       warnings.push(
         'metro.config.js exists but has no top-level `module.exports = ...` we could wrap. ' +
-          'Manually wrap your config with `withLunarCSS(...)` from `lunarcss/metro`.',
+          'Manually wrap your config with `withLunarCSS(...)` from `lunar-css/metro`.',
       )
       steps.push({ label: 'metro.config.js', result: { path: metroJsPath, status: 'unchanged' } })
     } else if (!merge.changed) {
@@ -58,7 +67,12 @@ export function runInitBare(options: InitBareOptions): InitBareReport {
 
   steps.push(ensureGitignore(projectRoot, dryRun))
   const ts = ensureTsconfigTypes(projectRoot, dryRun)
-  if (ts) steps.push(ts)
+  if (ts) {
+    steps.push(ts)
+  } else {
+    const ref = ensureTypesReference(projectRoot, dryRun, BARE_ENTRY_CANDIDATES)
+    if (ref) steps.push(ref)
+  }
 
   return { steps, warnings }
 }

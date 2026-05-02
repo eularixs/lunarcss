@@ -7,8 +7,17 @@ import {
   ensureGitignore,
   ensureLunarConfig,
   ensureTsconfigTypes,
+  ensureTypesReference,
   type InitStep,
 } from './init-shared.js'
+
+const EXPO_ENTRY_CANDIDATES = [
+  'app/_layout.tsx',
+  'app/_layout.ts',
+  'index.ts',
+  'index.tsx',
+  'index.js',
+] as const
 
 export interface InitExpoOptions {
   projectRoot: string
@@ -35,7 +44,7 @@ export function runInitExpo(options: InitExpoOptions): InitExpoReport {
     if (merge.reason === 'no-module-exports') {
       warnings.push(
         'metro.config.js exists but has no top-level `module.exports = ...` we could wrap. ' +
-          'Manually wrap your config with `withLunarCSS(...)` from `lunarcss/metro`.',
+          'Manually wrap your config with `withLunarCSS(...)` from `lunar-css/metro`.',
       )
       steps.push({ label: 'metro.config.js', result: { path: metroJsPath, status: 'unchanged' } })
     } else if (!merge.changed) {
@@ -60,7 +69,12 @@ export function runInitExpo(options: InitExpoOptions): InitExpoReport {
   steps.push(ensureGitignore(projectRoot, dryRun))
 
   const ts = ensureTsconfigTypes(projectRoot, dryRun)
-  if (ts) steps.push(ts)
+  if (ts) {
+    steps.push(ts)
+  } else {
+    const ref = ensureTypesReference(projectRoot, dryRun, EXPO_ENTRY_CANDIDATES)
+    if (ref) steps.push(ref)
+  }
 
   return { steps, warnings }
 }

@@ -15,9 +15,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      # pnpm version is read from `packageManager` in package.json.
+      # Do not pass `with.version` — pnpm/action-setup@v4 errors when both are set.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - uses: actions/setup-node@v4
         with:
@@ -49,4 +49,4 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@v4
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_HOST_URL: https://sonarcloud.io

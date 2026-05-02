@@ -12,7 +12,7 @@ No CSS parsing on mobile. No separate token files. One file, both platforms.
 ## Basic structure
 
 ```ts
-import { defineConfig } from 'lunarcss'
+import { defineConfig } from 'lunar-css'
 
 export default defineConfig({
   theme: {
@@ -54,7 +54,7 @@ See the full [Token Namespace Map](/docs/configuration/token-namespace-map) for 
 ## `defineConfig`
 
 ```ts
-import { defineConfig } from 'lunarcss'
+import { defineConfig } from 'lunar-css'
 ```
 
 `defineConfig` is a pass-through identity function that provides TypeScript autocompletion. It returns the config object unchanged — no magic at import time.
@@ -64,7 +64,7 @@ import { defineConfig } from 'lunarcss'
 The `LunarConfig` and `ThemeExtend` types are exported for manual use:
 
 ```ts
-import type { LunarConfig, ThemeExtend } from 'lunarcss'
+import type { LunarConfig, ThemeExtend } from 'lunar-css'
 ```
 
 ## Config discovery

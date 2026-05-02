@@ -1,0 +1,97 @@
+---
+title: Transitions
+description: transition, duration, delay, and ease utilities for declarative animations.
+---
+
+## Overview
+
+Transition classes declare animation **intent** as RN style keys that match `react-native-web` conventions:
+
+| Class | Style key | Value |
+| :-- | :-- | :-- |
+| `transition` | `transitionProperty` `transitionDuration` `transitionTimingFunction` | comma-separated property list / `150` / `cubic-bezier(0.4, 0, 0.2, 1)` |
+| `transition-colors` | `transitionProperty` | `color, background-color, border-color, ...` |
+| `transition-opacity` | `transitionProperty` | `opacity` |
+| `transition-transform` | `transitionProperty` | `transform` |
+| `transition-shadow` | `transitionProperty` | `box-shadow` |
+| `transition-all` | `transitionProperty` | `all` |
+| `transition-none` | `transitionProperty` `transitionDuration` | `none` / `0` |
+| `duration-{ms}` | `transitionDuration` | numeric ms |
+| `delay-{ms}` | `transitionDelay` | numeric ms |
+| `ease-{name}` | `transitionTimingFunction` | mapped cubic-bezier or `linear` |
+
+## Behavior matrix
+
+| Target | What happens |
+| :-- | :-- |
+| **Web** (Tailwind) | Real CSS transitions on the DOM. The transformer skips web entirely (`className` reaches the DOM untouched), so this section's classes work via Tailwind itself, not the lunar runtime. |
+| **Native** core (View / Text) | Style keys are silently ignored by RN. Transitions are inert until you pipe them into a runtime that reads them. |
+| **Native** + Animated / Reanimated | Read `style.transitionDuration` etc. off the resolved style object and feed your own value driver. |
+
+## Property groups
+
+```
+transition           → color, bg, border, opacity, transform, shadow, filter, ...
+transition-all       → all
+transition-colors    → color, background-color, border-color, text-decoration-color, fill, stroke
+transition-opacity   → opacity
+transition-shadow    → box-shadow
+transition-transform → transform
+transition-none      → none (duration set to 0)
+```
+
+## Duration
+
+```
+duration-{ms}     numeric Tailwind scale, e.g. duration-150, duration-300
+duration-[200ms]  arbitrary
+duration-[0.3s]   seconds — auto-converted to 300ms
+```
+
+## Delay
+
+```
+delay-{ms}      numeric ms, e.g. delay-200
+delay-[200ms]   arbitrary
+```
+
+## Easing
+
+```
+ease-linear     → linear
+ease-in         → cubic-bezier(0.4, 0, 1, 1)
+ease-out        → cubic-bezier(0, 0, 0.2, 1)
+ease-in-out     → cubic-bezier(0.4, 0, 0.2, 1)
+ease-[cubic-bezier(0.1, 0.7, 1, 0.1)]   arbitrary
+```
+
+## Examples
+
+```tsx
+// Hover-fade button (web full effect; native records intent only)
+<Pressable className="bg-primary transition-colors duration-200 ease-out active:bg-primary/80" />
+
+// Animated rotation
+<View className="rotate-12 transition-transform duration-300 ease-in-out" />
+
+// Stagger via delay
+<View className="opacity-0 transition-opacity duration-300 delay-150" />
+```
+
+## What you must do for visible motion
+
+Utility generation alone does not create motion. Two requirements:
+
+1. **State change after initial paint.** Motion is the interpolation between an old style and a new style; if the JSX never changes, nothing animates. Toggle a class via `useState` / Pressable / setTimeout / etc. Avoid mount/unmount swaps — the transition only runs if the same element persists across the change.
+2. **A runtime that reads the style keys.** On web, the browser's CSS engine reads `transitionDuration` etc. directly off RN-Web's emitted style and interpolates. On native, **`<View>` does NOT animate inline styles** — you need an animation driver:
+   - **Reanimated** (recommended): `useSharedValue` + `withTiming({ duration, easing })` driving a `useAnimatedStyle`. Visible on iOS, Android, and web.
+   - **Animated**: `Animated.timing(value, { toValue, duration }).start()` with `Animated.View`.
+
+See `example/app/(tabs)/motion.tsx` for a full working demo of both layers.
+
+## Out of MVP scope
+
+- **Keyframe-style `animate-spin` / `animate-pulse` / `animate-bounce`.** These need a keyframe driver. The MVP deliberately does NOT depend on Reanimated for the resolver itself; consumers opt in.
+- **CSS-first animation system** — would force a runtime DSL on native and fight RN's render model.
+
+The transition utilities above declare *intent*: the browser executes that intent on web, an Animation runtime executes it on native.

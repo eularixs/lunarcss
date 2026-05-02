@@ -1,6 +1,6 @@
 {
-  "name": "lunarcss",
-  "version": "0.1.0",
+  "name": "lunar-css",
+  "version": "0.2.0-beta.0",
   "description": "Plug-and-play Tailwind v4 styling engine for React Native and Web",
   "license": "MIT",
   "author": "Eularix Team",
@@ -18,7 +18,7 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "lunarcss": "./dist/cli/index.js"
+    "lunar-css": "./dist/cli/index.js"
   },
   "exports": {
     ".": {
@@ -87,9 +87,9 @@
     "jiti": "^2.4.0"
   },
   "peerDependencies": {
+    "postcss": ">=8.4.0",
     "react": ">=18.0.0",
-    "react-native": ">=0.73.0",
-    "postcss": ">=8.4.0"
+    "react-native": ">=0.73.0"
   },
   "peerDependenciesMeta": {
     "react-native": {
@@ -104,17 +104,18 @@
     "@babel/parser": "^7.25.0",
     "@babel/traverse": "^7.25.0",
     "@babel/types": "^7.25.0",
+    "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.6.8",
     "@types/babel__traverse": "^7.20.6",
     "@types/culori": "^2.1.0",
     "@types/node": "^22.0.0",
     "@types/react": "^18.3.0",
+    "@vitest/coverage-v8": "^2.1.0",
     "postcss": "^8.4.0",
     "react": "^18.3.0",
     "react-native": "^0.76.0",
     "tsup": "^8.3.0",
     "typescript": "^5.6.0",
-    "@vitest/coverage-v8": "^2.1.0",
     "vitest": "^2.1.0"
   },
   "engines": {

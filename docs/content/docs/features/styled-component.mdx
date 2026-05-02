@@ -1,0 +1,80 @@
+---
+title: styledComponent
+description: Wrap third-party RN components so they accept className and matching <x>ClassName props.
+---
+
+The Metro transformer rewrites whitelisted RN intrinsics at build time with zero runtime cost. For everything else — `LinearGradient`, `BlurView`, design-system primitives — wrap with `styledComponent`:
+
+```tsx
+import { styledComponent } from 'lunar-css'
+import { LinearGradient as _LinearGradient } from 'expo-linear-gradient'
+
+const LinearGradient = styledComponent(_LinearGradient)
+
+// Works on native AND web:
+<LinearGradient className="rounded-card overflow-hidden" colors={[...]} />
+```
+
+## Multi-style-prop components
+
+For components that accept multiple style props (`tintStyle`, `imageStyle`, `contentContainerStyle`, ...), pass `styleProps`:
+
+```tsx
+import { BlurView as _BlurView } from 'expo-blur'
+
+const BlurView = styledComponent(_BlurView, {
+  styleProps: ['style', 'tintStyle'],
+})
+
+<BlurView className="rounded-card" tintClassName="bg-zinc-900/60" />
+```
+
+Each style prop name pairs with a className prop derived by the convention:
+
+| Style prop | className prop |
+| :-- | :-- |
+| `style` | `className` |
+| `contentContainerStyle` | `contentContainerClassName` |
+| `imageStyle` | `imageClassName` |
+| `tintStyle` | `tintClassName` |
+| `<x>Style` | `<x>ClassName` |
+
+## Behavior on each platform
+
+Native and web run the same conversion path:
+
+1. For each declared style prop, read its sibling className prop.
+2. If a string is present, pass it through the lunar resolver via `__lcssTw`.
+3. Merge the resolved style with any pre-existing style on that prop (existing style wins on conflict — same precedence as the build-time transformer).
+4. Strip the className prop from the output so the underlying component never sees it.
+
+react-native-web turns the resulting style object into atomic CSS at render time — no Tailwind dependency on web.
+
+## When to use it
+
+- ✅ Third-party RN components consuming RN style objects
+- ✅ Custom design-system primitives that already accept `style`
+- ✅ Components needing extra `<x>ClassName` siblings beyond the default `className`
+
+## When NOT to use it
+
+- ❌ A whitelisted RN intrinsic (View, Text, ScrollView, ...) — the transformer rewrites those for free.
+- ❌ A wrapper component that already accepts a `className` prop and forwards it. Leave it alone — `styledComponent` is for components that consume RN style objects directly.
+
+## Whitelist (rewritten by the transformer)
+
+```
+View, Text, Image, ImageBackground, ScrollView,
+FlatList, SectionList, VirtualizedList,
+TextInput, TouchableOpacity, TouchableHighlight,
+TouchableWithoutFeedback, Pressable, SafeAreaView,
+Modal, ActivityIndicator, KeyboardAvoidingView, Switch
+```
+
+Multi-style siblings on whitelisted components:
+
+| Component | Style props | className props |
+| :-- | :-- | :-- |
+| `ScrollView`, `FlatList`, `SectionList`, `VirtualizedList` | `style`, `contentContainerStyle` | `className`, `contentContainerClassName` |
+| `ImageBackground` | `style`, `imageStyle` | `className`, `imageClassName` |
+| Everything else above | `style` | `className` |

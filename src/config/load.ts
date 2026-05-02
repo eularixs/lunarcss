@@ -2,8 +2,8 @@
 // Babel pipeline — pure TS evaluation. Safe to call from Metro config and
 // PostCSS plugin alike.
 
-import { existsSync } from 'node:fs'
-import { dirname, isAbsolute, resolve } from 'node:path'
+import { existsSync, statSync } from 'node:fs'
+import { isAbsolute, resolve } from 'node:path'
 import { createJiti } from 'jiti'
 import type { LunarConfig } from './types.js'
 
@@ -39,7 +39,11 @@ export function loadLunarConfig(
   }
   if (!filepath) return null
 
-  const jiti = createJiti(dirname(filepath), {
+  // Pass the config FILE path (not its dirname) so jiti's module resolution is
+  // anchored to the config file. Anchoring to a directory makes jiti read the
+  // directory's package.json — in Expo/RN apps that "main" is "expo-router/entry"
+  // which jiti tries (and fails) to resolve, crashing the loader.
+  const jiti = createJiti(filepath, {
     interopDefault: true,
     moduleCache: false,
     fsCache: false,
@@ -54,9 +58,7 @@ export function loadLunarConfig(
 
 function isDir(p: string): boolean {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const fs = require('node:fs') as typeof import('node:fs')
-    return fs.statSync(p).isDirectory()
+    return statSync(p).isDirectory()
   } catch {
     return false
   }

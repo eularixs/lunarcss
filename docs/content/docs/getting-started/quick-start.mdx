@@ -7,7 +7,7 @@ description: Set up LunarCSS in Expo, Next.js, or bare React Native in under two
 
 ```bash
 cd my-expo-app
-npx lunarcss init
+npx lunar-css init
 ```
 
 Generated files:
@@ -15,8 +15,8 @@ Generated files:
 ```
 lunar.config.ts        # token source of truth
 metro.config.js        # withLunarCSS wrapped
-.gitignore             # .lunarcss/ ignored
-tsconfig.json          # types: ["lunarcss/types"] appended
+.gitignore             # .lunar-css/ ignored
+tsconfig.json          # types: ["lunar-css/types"] appended
 ```
 
 Use `className` immediately:
@@ -45,14 +45,14 @@ npx expo start
 
 ```bash
 cd my-next-app
-npx lunarcss init
+npx lunar-css init
 ```
 
 Generated files:
 
 ```
 lunar.config.ts
-app/globals.css        # @import "tailwindcss" + @plugin "lunarcss"
+app/globals.css        # @import "tailwindcss" + @plugin "lunar-css"
 .gitignore
 tsconfig.json
 ```
@@ -63,7 +63,7 @@ Add the PostCSS plugin to `postcss.config.js`:
 module.exports = {
   plugins: {
     '@tailwindcss/postcss': {},
-    lunarcss: {},
+    'lunar-css': {},
   },
 }
 ```
@@ -101,14 +101,14 @@ export default function Page() {
 
 ```bash
 cd my-rn-app
-npx lunarcss init
+npx lunar-css init
 ```
 
 Same files as Expo, but `metro.config.js` uses `@react-native/metro-config` + `mergeConfig`:
 
 ```js
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config')
-const { withLunarCSS } = require('lunarcss/metro')
+const { withLunarCSS } = require('lunar-css/metro')
 
 const config = {}
 module.exports = withLunarCSS(mergeConfig(getDefaultConfig(__dirname), config))
@@ -127,7 +127,7 @@ If you prefer to wire things manually:
 
 ```js
 const { getDefaultConfig } = require('expo/metro-config')
-const { withLunarCSS } = require('lunarcss/metro')
+const { withLunarCSS } = require('lunar-css/metro')
 
 const config = getDefaultConfig(__dirname)
 module.exports = withLunarCSS(config)
@@ -136,7 +136,7 @@ module.exports = withLunarCSS(config)
 3. Add types to `tsconfig.json`:
 
 ```json
-{ "compilerOptions": { "types": ["lunarcss/types"] } }
+{ "compilerOptions": { "types": ["lunar-css/types"] } }
 ```
 
 ### Web
@@ -148,7 +148,7 @@ module.exports = withLunarCSS(config)
 module.exports = {
   plugins: {
     '@tailwindcss/postcss': {},
-    lunarcss: {},
+    'lunar-css': {},
   },
 }
 ```
@@ -157,5 +157,5 @@ module.exports = {
 
 ```css
 @import "tailwindcss";
-@plugin "lunarcss";
+@plugin "lunar-css";
 ```

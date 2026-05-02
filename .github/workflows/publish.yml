@@ -20,8 +20,11 @@ jobs:
         env:
           COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
-          if echo "${COMMIT_MSG}" | grep -qE '^release: (patch|minor|major)'; then
-            BUMP=$(echo "${COMMIT_MSG}" | grep -oE '(patch|minor|major)')
+          # Match `release: (patch|minor|major)` either at the start of the
+          # commit message or after a separator (newline / space / comma).
+          # Lets squash-merge titles like `fix: foo, release: minor` trigger.
+          if printf '%s' "${COMMIT_MSG}" | grep -qE '(^|[[:space:],])release: (patch|minor|major)\b'; then
+            BUMP=$(printf '%s' "${COMMIT_MSG}" | grep -oE 'release: (patch|minor|major)' | head -n1 | awk '{print $2}')
             echo "should_publish=true" >> "$GITHUB_OUTPUT"
             echo "bump_type=${BUMP}" >> "$GITHUB_OUTPUT"
           else
@@ -42,9 +45,9 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      # pnpm version is read from `packageManager` in package.json.
+      # Do not pass `with.version` — pnpm/action-setup@v4 errors when both are set.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - uses: actions/setup-node@v4
         with:

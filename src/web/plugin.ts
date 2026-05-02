@@ -71,7 +71,7 @@ function shouldRunOn(root: Root): boolean {
       match = true
       return false
     }
-    if (rule.name === 'plugin' && /lunarcss/.test(rule.params)) {
+    if (rule.name === 'plugin' && /lunar-css|lunarcss/.test(rule.params)) {
       match = true
       return false
     }

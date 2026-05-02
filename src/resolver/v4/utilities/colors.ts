@@ -2,6 +2,7 @@ import { oklch, formatHex, clampChroma, parse as parseColor, rgb } from 'culori'
 import type { ResolveResult, ResolvedStyle } from '../../../runtime/types.js'
 import { getToken } from '../../../runtime/tokens.js'
 import { NAMED_COLORS } from './colors-keywords.js'
+import { resolvePaletteColor } from './colors-palette.js'
 
 const colorMemo = new Map<string, string>()
 
@@ -128,6 +129,11 @@ function resolveColorValue(
     tokensUsed.push(tokenName)
     return toRNColor(tokenValue)
   }
+
+  // Tailwind v3 default palette (zinc-900, slate-500, red-500, ...). Tokens
+  // win over palette so users can override per scale via theme.extend.colors.
+  const paletteHit = resolvePaletteColor(raw)
+  if (paletteHit !== null) return paletteHit
 
   return null
 }

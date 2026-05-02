@@ -37,12 +37,14 @@ describe('runInitBare (fresh project)', () => {
     expect(readFileSync(join(root, '.gitignore'), 'utf8')).toMatch(/# LunarCSS\n\.lunarcss\//)
   })
 
-  it('does NOT create any CSS files', () => {
+  it('does not create web styling files (web uses same lunar engine as native)', () => {
     const root = mkRoot()
     runInitBare({ projectRoot: root })
-    expect(existsSync(join(root, 'app/globals.css'))).toBe(false)
+    // Web no longer needs Tailwind/PostCSS — the lunar resolver runs on web
+    // too, since react-native-web strips className from primitives.
     expect(existsSync(join(root, 'global.css'))).toBe(false)
-    expect(existsSync(join(root, 'lunar.css'))).toBe(false)
+    expect(existsSync(join(root, 'postcss.config.js'))).toBe(false)
+    expect(existsSync(join(root, 'app/globals.css'))).toBe(false)
   })
 })
 
@@ -58,14 +60,14 @@ module.exports = mergeConfig(config, {})
     )
     runInitBare({ projectRoot: root })
     const out = readFileSync(join(root, 'metro.config.js'), 'utf8')
-    expect(out).toMatch(/require\(['"]lunarcss\/metro['"]\)/)
+    expect(out).toMatch(/require\(['"]lunar-css\/metro['"]\)/)
     expect(out).toMatch(/module\.exports\s*=\s*withLunarCSS\(/)
   })
 
   it('skips when already wrapped', () => {
     const root = mkRoot()
     const original = `const { getDefaultConfig } = require('@react-native/metro-config')
-const { withLunarCSS } = require('lunarcss/metro')
+const { withLunarCSS } = require('lunar-css/metro')
 module.exports = withLunarCSS(getDefaultConfig(__dirname))
 `
     writeFileSync(join(root, 'metro.config.js'), original)
@@ -93,7 +95,7 @@ describe('runInitBare (idempotent re-run)', () => {
       'unchanged',
     )
     const out = readFileSync(join(root, 'metro.config.js'), 'utf8')
-    expect(out.match(/lunarcss\/metro/g)?.length).toBe(1)
+    expect(out.match(/lunar-css\/metro/g)?.length).toBe(1)
   })
 
   it('does not duplicate .gitignore section', () => {

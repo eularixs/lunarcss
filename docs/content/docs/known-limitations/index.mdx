@@ -8,14 +8,15 @@ description: Current limitations in v0.1.0 and their planned status.
 | Limitation | Status | Notes |
 | :-- | :-- | :-- |
 | Hot-reload of `lunar.config.ts` on native | Metro restart required | PostCSS hot-reload works on web. Native content-hash invalidation planned for v0.3.0. |
-| Container queries on mobile | Silently dropped | Not supported by React Native. Web works via Tailwind. `@container` and `@*:` modifiers are no-ops on native — no crash, no warning. |
+| Container queries on mobile | Silently dropped | Not supported by React Native. `@container` and `@*:` modifiers are no-ops on native — no crash, no warning. |
 | OKLCH on mobile | Clamped to nearest sRGB | Wide-gamut values lose chroma. `culori` converts at resolver time. Dev warning emitted when clamping occurs. Use sRGB-safe OKLCH or a hex fallback for precision. |
-| `animate-*` classes | Skipped with dev warning | Use [`react-native-ease`](https://github.com/marklawlor/react-native-ease) or Reanimated. `tw()` API planned for v0.2.0. |
-| Tailwind v3 fallback resolver | Deferred | v4 is the primary target. Mixed v3/v4 codebases — open an issue. |
+| Keyframe `animate-*` classes (`animate-spin`, `animate-pulse`, ...) | Out of scope | Drive Reanimated `withTiming` / `withSpring` directly. The `transition-*` / `duration-*` / `ease-*` / `delay-*` utilities ship and emit RN-Web-compatible CSS time strings — see `example/app/(tabs)/motion.tsx`. |
+| Tailwind v3 *resolver* parity | Deferred | The Tailwind v3 named color palette (22 scales × 11 steps) ships as a fallback in the v4 resolver; v3 modifier/breakpoint semantics remain deferred. |
 | `color-mix()` on mobile | Not supported | Pre-compute in `lunar.config.ts` using concrete hex or OKLCH values. |
 | Arbitrary background image URL classes on mobile | Skipped | Tailwind URL-based background utilities are not applied on native. Use the `Image` component with a `source` prop instead. |
-| 3rd-party RN components | Babel transformer skips them | Only RN intrinsic components get the `className` transform. Wrap `className`-aware 3rd-party components in your own factory, or use the `style` prop alongside `__lcssTw()`. |
-| Babel-only pipeline | Not supported | Both real RN (Metro) and real web (PostCSS) pipelines have first-class support. A standalone Babel plugin with no Metro is not a supported configuration. |
+| 3rd-party RN components | Use `styledComponent()` | The Metro transformer rewrites whitelisted RN intrinsics (see STYLE_PROPS_MAP). Wrap any other component with `styledComponent(C, { styleProps: [...] })` from `lunarcss` — works on native and web. |
+| Babel-only pipeline | Not supported | The runtime path is Metro on native and (lunar resolver inside RN-Web's `StyleSheet`) on web. A standalone Babel plugin with no Metro is not a supported configuration. |
+| Tailwind CSS on web | Not used | react-native-web's `View` / `Text` / `Pressable` strip the `className` prop at render time, so even a fully configured Tailwind cannot match the preserved class strings on the DOM. The resolver runs on web instead — RN-Web's `StyleSheet` emits atomic CSS from the resulting style object. One engine, no Tailwind dependency on web. |
 
 ## OKLCH detail
 
@@ -30,24 +31,44 @@ In dev mode, a warning is logged when clamping changes the perceptual lightness 
 
 ## 3rd-party component detail
 
-The Metro transformer only transforms `className` on elements whose tag name is in the `RN_INTRINSICS` set:
+The Metro transformer rewrites `className` (and any number of `<x>ClassName` siblings — `contentContainerClassName`, `imageClassName`, ...) on whitelisted RN components:
 
 ```
-View, Text, TextInput, Image, ScrollView, FlatList, SectionList,
-TouchableOpacity, TouchableHighlight, Pressable, Modal,
-SafeAreaView, KeyboardAvoidingView, ActivityIndicator,
-ImageBackground, VirtualizedList
+View, Text, TextInput, Image, ImageBackground, ScrollView,
+FlatList, SectionList, VirtualizedList,
+TouchableOpacity, TouchableHighlight, TouchableWithoutFeedback,
+Pressable, Modal, SafeAreaView, KeyboardAvoidingView,
+ActivityIndicator, Switch
 ```
 
-For 3rd-party components, use the runtime `__lcssTw` directly:
+Multi-style components get the corresponding sibling class props automatically (e.g. `contentContainerClassName` → `contentContainerStyle` on `ScrollView`/`FlatList`/`SectionList`/`VirtualizedList`, `imageClassName` → `imageStyle` on `ImageBackground`).
+
+For 3rd-party components (LinearGradient, BlurView, design-system primitives), wrap with `styledComponent`:
 
 ```tsx
-import { __lcssTw } from 'lunarcss/runtime'
-import { SomeThirdPartyComponent } from 'some-library'
+import { styledComponent } from 'lunar-css'
+import { LinearGradient as _LinearGradient } from 'expo-linear-gradient'
 
+const LinearGradient = styledComponent(_LinearGradient)
+
+// Now accepts className on native AND web
+<LinearGradient className="rounded-card overflow-hidden" colors={[...]} />
+```
+
+For multi-style-prop third-party components, pass the style prop names:
+
+```tsx
+const BlurView = styledComponent(_BlurView, { styleProps: ['style', 'tintStyle'] })
+<BlurView className="rounded-card" tintClassName="bg-zinc-900/60" />
+```
+
+Or use the `__lcssTw` runtime helper directly:
+
+```tsx
+import { __lcssTw } from 'lunar-css/runtime'
 <SomeThirdPartyComponent style={__lcssTw('p-4 bg-primary rounded-lg')} />
 ```
 
 ## Reporting issues
 
-Found a limitation not listed here? [Open an issue](https://github.com/eularix/lunarcss/issues).
+Found a limitation not listed here? [Open an issue](https://github.com/eularix/lunar-css/issues).
