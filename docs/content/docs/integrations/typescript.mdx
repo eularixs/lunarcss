@@ -8,12 +8,12 @@ description: Adding className support to React Native components via type augmen
 ```json
 {
   "compilerOptions": {
-    "types": ["lunarcss/types"]
+    "types": ["lunar-css/types"]
   }
 }
 ```
 
-`lunarcss init` does this automatically.
+`lunar-css init` does this automatically.
 
 ## What gets augmented
 
@@ -32,7 +32,7 @@ LunarCSS augments the `ViewProps`, `TextProps`, `TextInputProps`, `ImageProps`, 
 | `SectionList` | `SectionListProps` |
 | `Modal` | `ModalProps` |
 
-After adding `"lunarcss/types"`, TypeScript accepts `className` on all these components:
+After adding `"lunar-css/types"`, TypeScript accepts `className` on all these components:
 
 ```tsx
 import { View, Text } from 'react-native'
@@ -44,7 +44,7 @@ import { View, Text } from 'react-native'
 
 ## Without the types
 
-Without `"lunarcss/types"` in `tsconfig.json`, TypeScript will error:
+Without `"lunar-css/types"` in `tsconfig.json`, TypeScript will error:
 
 ```
 Property 'className' does not exist on type 'IntrinsicAttributes & ViewProps'
@@ -71,7 +71,7 @@ export function Card({ className, ...rest }: CardProps) {
 Use for typed config in helper utilities:
 
 ```ts
-import type { LunarConfig } from 'lunarcss'
+import type { LunarConfig } from 'lunar-css'
 
 function buildTheme(config: LunarConfig) {
   // ...
@@ -83,7 +83,7 @@ function buildTheme(config: LunarConfig) {
 For typed `theme.extend` objects:
 
 ```ts
-import type { ThemeExtend } from 'lunarcss'
+import type { ThemeExtend } from 'lunar-css'
 
 const myTokens: ThemeExtend = {
   colors: { primary: '#6366f1' },

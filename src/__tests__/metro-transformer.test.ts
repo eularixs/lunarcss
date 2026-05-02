@@ -51,7 +51,7 @@ describe('metro transformClassNames', () => {
       export const E = () => <View className="p-4" />
     `
     const out = transformClassNames({ src, filename: 'E.tsx' })
-    expect(out.code).toMatch(/import\s*\{\s*__lcssTw\s*\}\s*from\s*["']lunarcss\/runtime["']/)
+    expect(out.code).toMatch(/import\s*\{\s*__lcssTw\s*\}\s*from\s*["']lunar-css\/runtime["']/)
   })
 
   it('does not inject import when nothing transformed', () => {
@@ -60,7 +60,7 @@ describe('metro transformClassNames', () => {
       export const F = () => <Custom className="p-4" />
     `
     const out = transformClassNames({ src, filename: 'F.tsx' })
-    expect(out.code).not.toContain('lunarcss/runtime')
+    expect(out.code).not.toContain('lunar-css/runtime')
   })
 
   it('produces a sourcemap', () => {

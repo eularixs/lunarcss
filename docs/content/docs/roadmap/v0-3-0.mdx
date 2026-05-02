@@ -15,7 +15,7 @@ Currently, editing `lunar.config.ts` on native requires a Metro restart. v0.3.0 
 1. Metro detects the change via `watchFolders`
 2. `withLunarCSS` re-runs `loadLunarConfig` + `flattenTokens`
 3. Compares SHA-1 hash of new tokens against previous
-4. If changed: rewrites `.lunarcss/__theme__.js`, calls `invalidateTokens()` to clear the LRU cache
+4. If changed: rewrites `.lunar-css/__theme__.js`, calls `invalidateTokens()` to clear the LRU cache
 5. Fast Refresh picks up the change — no full Metro restart
 
 The web path already has hot-reload via PostCSS dependency messages.
@@ -45,4 +45,4 @@ The Tailwind v3 named color palette ships in v0.2.0 as a fallback inside the v4 
 
 ## Status
 
-Planned. Timelines and scope subject to change. Follow [GitHub Releases](https://github.com/eularix/lunarcss/releases) or watch the repo.
+Planned. Timelines and scope subject to change. Follow [GitHub Releases](https://github.com/eularix/lunar-css/releases) or watch the repo.

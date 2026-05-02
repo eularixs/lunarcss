@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// `lunarcss` CLI — entry point. Binary is `lunarcss` (not `lunar`) to avoid
+// `lunar-css` CLI — entry point. Binary is `lunar-css` (not `lunar`) to avoid
 // colliding with the Lunar Kit CLI.
 
 import { detectProject } from './detect.js'
@@ -10,12 +10,12 @@ import type { InitStep } from './init-shared.js'
 
 const VERSION = '0.0.0'
 
-const HELP = `lunarcss ${VERSION}
+const HELP = `lunar-css ${VERSION}
 
 Usage:
-  lunarcss init [--dry-run]   Detect project type and configure LunarCSS
-  lunarcss --help             Show this message
-  lunarcss --version          Print version
+  lunar-css init [--dry-run]   Detect project type and configure LunarCSS
+  lunar-css --help             Show this message
+  lunar-css --version          Print version
 
 Supported targets: expo · rn-bare · nextjs
 `
@@ -48,12 +48,12 @@ function runInit(args: readonly string[]): number {
   const projectRoot = process.cwd()
   const detect = detectProject(projectRoot)
 
-  console.log(`[lunarcss] Detected project: ${detect.kind}`)
+  console.log(`[lunar-css] Detected project: ${detect.kind}`)
   if (detect.expoSdkVersion !== null) {
-    console.log(`[lunarcss] Expo SDK: ${detect.expoSdkVersion}`)
+    console.log(`[lunar-css] Expo SDK: ${detect.expoSdkVersion}`)
   }
   for (const note of detect.notes) {
-    console.log(`[lunarcss] Note: ${note}`)
+    console.log(`[lunar-css] Note: ${note}`)
   }
 
   let report: Report | null = null
@@ -64,11 +64,11 @@ function runInit(args: readonly string[]): number {
   } else if (detect.kind === 'nextjs') {
     report = runInitNextjs({ projectRoot, dryRun })
   } else {
-    console.error('[lunarcss] Could not detect Expo / Next.js / RN Bare in this project.')
+    console.error('[lunar-css] Could not detect Expo / Next.js / RN Bare in this project.')
     return 1
   }
 
-  if (dryRun) console.log('[lunarcss] Dry run — no files written.')
+  if (dryRun) console.log('[lunar-css] Dry run — no files written.')
   printReport(report)
   return 0
 }
@@ -86,7 +86,7 @@ function main(argv: readonly string[]): number {
   if (cmd === 'init') {
     return runInit(argv.slice(1))
   }
-  console.error(`[lunarcss] Unknown command: "${cmd}"`)
+  console.error(`[lunar-css] Unknown command: "${cmd}"`)
   console.error(HELP)
   return 1
 }

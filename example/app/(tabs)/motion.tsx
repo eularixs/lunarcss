@@ -22,7 +22,7 @@ import Animated, {
 } from 'react-native-reanimated'
 // Lunar resolver — exposed as `tw` so we can build base styles outside JSX.
 // `__lcssTw` is the same engine the transformer injects automatically.
-import { __lcssTw } from 'lunarcss/runtime'
+import { __lcssTw } from 'lunar-css/runtime'
 
 export default function MotionScreen() {
   return (

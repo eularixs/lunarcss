@@ -1,4 +1,4 @@
-/// <reference types="lunarcss/types" />
+/// <reference types="lunar-css/types" />
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';

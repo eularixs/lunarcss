@@ -247,12 +247,12 @@ export default function HomePage() {
           </div>
           <pre className="mb-3 overflow-x-auto rounded-lg border border-fd-border bg-fd-card p-4 text-sm">
             <code className="text-fd-foreground">
-              <span className="text-fd-muted-foreground">$</span> pnpm add lunarcss
+              <span className="text-fd-muted-foreground">$</span> pnpm add lunar-css
             </code>
           </pre>
           <pre className="mb-6 overflow-x-auto rounded-lg border border-fd-border bg-fd-card p-4 text-sm">
             <code className="text-fd-foreground">
-              <span className="text-fd-muted-foreground">$</span> npx lunarcss init
+              <span className="text-fd-muted-foreground">$</span> npx lunar-css init
             </code>
           </pre>
           <pre className="overflow-x-auto rounded-xl border border-fd-border bg-fd-card p-6 text-sm leading-relaxed shadow-sm">

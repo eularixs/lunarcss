@@ -46,7 +46,7 @@ Multi-style components get the corresponding sibling class props automatically (
 For 3rd-party components (LinearGradient, BlurView, design-system primitives), wrap with `styledComponent`:
 
 ```tsx
-import { styledComponent } from 'lunarcss'
+import { styledComponent } from 'lunar-css'
 import { LinearGradient as _LinearGradient } from 'expo-linear-gradient'
 
 const LinearGradient = styledComponent(_LinearGradient)
@@ -65,10 +65,10 @@ const BlurView = styledComponent(_BlurView, { styleProps: ['style', 'tintStyle']
 Or use the `__lcssTw` runtime helper directly:
 
 ```tsx
-import { __lcssTw } from 'lunarcss/runtime'
+import { __lcssTw } from 'lunar-css/runtime'
 <SomeThirdPartyComponent style={__lcssTw('p-4 bg-primary rounded-lg')} />
 ```
 
 ## Reporting issues
 
-Found a limitation not listed here? [Open an issue](https://github.com/eularix/lunarcss/issues).
+Found a limitation not listed here? [Open an issue](https://github.com/eularix/lunar-css/issues).

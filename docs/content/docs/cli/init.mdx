@@ -1,15 +1,15 @@
 ---
-title: lunarcss init
+title: lunar-css init
 description: Auto-detect your project type and configure everything in one command.
 ---
 
 ## Usage
 
 ```bash
-npx lunarcss init           # detect + configure
-npx lunarcss init --dry-run # preview without writing
-npx lunarcss --version
-npx lunarcss --help
+npx lunar-css init           # detect + configure
+npx lunar-css init --dry-run # preview without writing
+npx lunar-css --version
+npx lunar-css --help
 ```
 
 ## Project detection
@@ -34,15 +34,15 @@ Expo wins when both `expo` and `react-native` are present.
 ```
 lunar.config.ts        created — token source of truth
 metro.config.js        created or AST-merged
-.gitignore             updated — .lunarcss/ ignored
-tsconfig.json          updated — types: ["lunarcss/types"]
+.gitignore             updated — .lunar-css/ ignored
+tsconfig.json          updated — types: ["lunar-css/types"]
 ```
 
 Default `metro.config.js`:
 
 ```js
 const { getDefaultConfig } = require('expo/metro-config')
-const { withLunarCSS } = require('lunarcss/metro')
+const { withLunarCSS } = require('lunar-css/metro')
 
 const config = getDefaultConfig(__dirname)
 module.exports = withLunarCSS(config)
@@ -62,7 +62,7 @@ tsconfig.json          updated
 ```css
 /* LunarCSS */
 @import "tailwindcss";
-@plugin "lunarcss";
+@plugin "lunar-css";
 ```
 
 The CLI searches 8 candidate paths for an existing globals CSS file before creating a new one.
@@ -73,7 +73,7 @@ Same as Expo but uses `@react-native/metro-config` + `mergeConfig`:
 
 ```js
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config')
-const { withLunarCSS } = require('lunarcss/metro')
+const { withLunarCSS } = require('lunar-css/metro')
 
 const config = {}
 module.exports = withLunarCSS(mergeConfig(getDefaultConfig(__dirname), config))
@@ -84,7 +84,7 @@ module.exports = withLunarCSS(mergeConfig(getDefaultConfig(__dirname), config))
 All runners generate the same starter config:
 
 ```ts
-import { defineConfig } from 'lunarcss'
+import { defineConfig } from 'lunar-css'
 
 export default defineConfig({
   theme: {
@@ -110,7 +110,7 @@ export default defineConfig({
 Preview what the CLI would write without touching any files:
 
 ```bash
-npx lunarcss init --dry-run
+npx lunar-css init --dry-run
 ```
 
 Output shows each file with its planned action:

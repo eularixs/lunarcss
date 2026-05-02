@@ -35,6 +35,6 @@ export default defineConfig({
     // bare specifier to the user's generated .lunarcss/__theme__.js at bundle
     // time. If tsup inlines it here, the bundle ships with the empty default
     // tokens and Metro never gets a chance to redirect.
-    'lunarcss/__theme__',
+    'lunar-css/__theme__',
   ],
 })

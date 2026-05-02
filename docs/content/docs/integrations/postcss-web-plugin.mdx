@@ -14,7 +14,7 @@ The `lunarcss` PostCSS plugin reads `lunar.config.ts` via `jiti` and emits an `@
 module.exports = {
   plugins: {
     '@tailwindcss/postcss': {},
-    lunarcss: {},
+    'lunar-css': {},
   },
 }
 ```
@@ -24,13 +24,13 @@ Your entry CSS file:
 ```css
 /* app/globals.css */
 @import "tailwindcss";
-@plugin "lunarcss";
+@plugin "lunar-css";
 ```
 
 ## Options
 
 ```js
-const lunarcss = require('lunarcss/web/plugin')
+const lunarcss = require('lunar-css/web/plugin')
 
 module.exports = {
   plugins: [
@@ -51,7 +51,7 @@ Input:
 ```css
 /* LunarCSS */
 @import "tailwindcss";
-@plugin "lunarcss";
+@plugin "lunar-css";
 ```
 
 Output (with `colors.primary = '#6366f1'`, `spacing.xs = '4px'`):
@@ -64,7 +64,7 @@ Output (with `colors.primary = '#6366f1'`, `spacing.xs = '4px'`):
   --spacing-xs: 4px
 }
 @import "tailwindcss";
-@plugin "lunarcss";
+@plugin "lunar-css";
 ```
 
 Tokens are sorted alphabetically. The `/* lunarcss:emitted */` marker prevents double injection on re-runs.
@@ -72,7 +72,7 @@ Tokens are sorted alphabetically. The `/* lunarcss:emitted */` marker prevents d
 ## Injection target
 
 - If `@import "tailwindcss"` is found → `@theme {}` is inserted directly before it
-- If only `@plugin "lunarcss"` is found → `@theme {}` is prepended to the root
+- If only `@plugin "lunar-css"` is found → `@theme {}` is prepended to the root
 - If neither is found → plugin skips the file entirely (avoids polluting unrelated stylesheets)
 
 ## Hot-reload
@@ -88,7 +88,7 @@ Re-running PostCSS on already-emitted output is a no-op — the `/* lunarcss:emi
 ## Next.js example
 
 ```bash
-npx lunarcss init   # generates globals.css + updates postcss.config.js
+npx lunar-css init   # generates globals.css + updates postcss.config.js
 ```
 
 Or manually:
@@ -97,7 +97,7 @@ Or manually:
 
 ```css
 @import "tailwindcss";
-@plugin "lunarcss";
+@plugin "lunar-css";
 ```
 
 2. `app/layout.tsx`:
@@ -112,7 +112,7 @@ import './globals.css'
 module.exports = {
   plugins: {
     '@tailwindcss/postcss': {},
-    lunarcss: {},
+    'lunar-css': {},
   },
 }
 ```

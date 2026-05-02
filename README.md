@@ -10,7 +10,7 @@
 
 | Problem | LunarCSS |
 | :-- | :-- |
-| NativeWind setup is complex | `lunarcss init` — single command |
+| NativeWind setup is complex | `lunar-css init` — single command |
 | TWRNC is locked to Tailwind v3 | Native Tailwind v4 support |
 | TWRNC has no web support | Same `className` works on RN + Web |
 | TWRNC resolves at runtime every render | Build-time extraction + LRU cache |
@@ -23,11 +23,11 @@
 ## Install
 
 ```bash
-pnpm add lunarcss
+pnpm add lunar-css
 # or
-npm install lunarcss
+npm install lunar-css
 # or
-yarn add lunarcss
+yarn add lunar-css
 ```
 
 Peer dependencies (auto-install or already present):
@@ -44,7 +44,7 @@ Peer dependencies (auto-install or already present):
 
 ```bash
 cd my-expo-app
-npx lunarcss init
+npx lunar-css init
 ```
 
 Generates:
@@ -52,8 +52,8 @@ Generates:
 ```
 lunar.config.ts        # token source of truth
 metro.config.js        # withLunarCSS wrapped (or merged into existing)
-.gitignore             # .lunarcss/ ignored
-tsconfig.json          # types: ["lunarcss/types"] appended
+.gitignore             # .lunar-css/ ignored
+tsconfig.json          # types: ["lunar-css/types"] appended
 ```
 
 Use `className` on any RN component:
@@ -74,7 +74,7 @@ export default function Screen() {
 
 ```bash
 cd my-rn-app
-npx lunarcss init
+npx lunar-css init
 ```
 
 Same outputs as Expo, but `metro.config.js` uses `@react-native/metro-config` + `mergeConfig`.
@@ -83,14 +83,14 @@ Same outputs as Expo, but `metro.config.js` uses `@react-native/metro-config` + 
 
 ```bash
 cd my-next-app
-npx lunarcss init
+npx lunar-css init
 ```
 
 Generates:
 
 ```
 lunar.config.ts        # same template as native
-app/globals.css        # @import "tailwindcss" + @plugin "lunarcss"
+app/globals.css        # @import "tailwindcss" + @plugin "lunar-css"
 .gitignore
 tsconfig.json
 ```
@@ -101,12 +101,12 @@ Add the PostCSS plugin to `postcss.config.js`:
 module.exports = {
   plugins: {
     '@tailwindcss/postcss': {},
-    lunarcss: {},
+    'lunar-css': {},
   },
 }
 ```
 
-(Or use `lunarcss/web/plugin` directly — see [Web Plugin](#web-plugin).)
+(Or use `lunar-css/web/plugin` directly — see [Web Plugin](#web-plugin).)
 
 Import `app/globals.css` from your root layout:
 
@@ -178,7 +178,7 @@ For third-party components NOT in the whitelist (LinearGradient, BlurView,
 your own design-system primitives), wrap with `styledComponent`:
 
 ```tsx
-import { styledComponent } from 'lunarcss'
+import { styledComponent } from 'lunar-css'
 import { LinearGradient as _LinearGradient } from 'expo-linear-gradient'
 
 const LinearGradient = styledComponent(_LinearGradient)
@@ -215,7 +215,7 @@ themes, animated values), use:
 ### `useLunarCSS()`
 
 ```tsx
-import { useLunarCSS } from 'lunarcss'
+import { useLunarCSS } from 'lunar-css'
 
 function Screen() {
   const { tw, token } = useLunarCSS()
@@ -233,7 +233,7 @@ function Screen() {
 Typed token accessor backed by the live registry:
 
 ```tsx
-import { vars } from 'lunarcss'
+import { vars } from 'lunar-css'
 
 vars.primary  // "#6366f1"
 vars.accent   // "#f59e0b"
@@ -246,7 +246,7 @@ Map logical names to resolved token values. Useful for libraries that take
 theme objects (React Navigation, Reanimated, etc.):
 
 ```tsx
-import { lunarTheme } from 'lunarcss'
+import { lunarTheme } from 'lunar-css'
 import { ThemeProvider } from '@react-navigation/native'
 
 const NavTheme = {
@@ -271,7 +271,7 @@ const NavTheme = {
 Single source of truth. Read by Metro at config time on native, by PostCSS at build time on web.
 
 ```ts
-import { defineConfig } from 'lunarcss'
+import { defineConfig } from 'lunar-css'
 
 export default defineConfig({
   theme: {
@@ -329,15 +329,15 @@ Flat `tokens` overrides namespaced values when both define the same key.
 
 ---
 
-## CLI — `lunarcss init`
+## CLI — `lunar-css init`
 
 Auto-detects project type and configures everything:
 
 ```bash
-npx lunarcss init           # detect + configure
-npx lunarcss init --dry-run # preview without writing
-npx lunarcss --version
-npx lunarcss --help
+npx lunar-css init           # detect + configure
+npx lunar-css init --dry-run # preview without writing
+npx lunar-css --version
+npx lunar-css --help
 ```
 
 Detection:
@@ -374,7 +374,7 @@ Output:
 
 ```js
 const { getDefaultConfig } = require('expo/metro-config');
-const { withLunarCSS } = require('lunarcss/metro');
+const { withLunarCSS } = require('lunar-css/metro');
 const config = getDefaultConfig(__dirname);
 config.resolver.assetExts.push('lottie');
 module.exports = withLunarCSS(config);
@@ -386,11 +386,11 @@ Existing user code preserved — only the wrap + import are added.
 
 ## Web Plugin
 
-The `lunarcss/web/plugin` PostCSS plugin reads `lunar.config.ts` at build time and emits an `@theme {}` block before `@import "tailwindcss"`.
+The `lunar-css/web/plugin` PostCSS plugin reads `lunar.config.ts` at build time and emits an `@theme {}` block before `@import "tailwindcss"`.
 
 ```js
 // postcss.config.js
-const lunarcss = require('lunarcss/web/plugin')
+const lunarcss = require('lunar-css/web/plugin')
 
 module.exports = {
   plugins: [
@@ -417,7 +417,7 @@ Input:
 ```css
 /* LunarCSS */
 @import "tailwindcss";
-@plugin "lunarcss";
+@plugin "lunar-css";
 ```
 
 Output (with `colors.primary = '#6366f1'`, `spacing.xs = '4px'`):
@@ -430,7 +430,7 @@ Output (with `colors.primary = '#6366f1'`, `spacing.xs = '4px'`):
   --spacing-xs: 4px
 }
 @import "tailwindcss";
-@plugin "lunarcss";
+@plugin "lunar-css";
 ```
 
 ### Hot-reload

@@ -69,7 +69,7 @@ export const STYLE_PROPS_MAP: Readonly<Record<string, readonly string[]>> = {
 export { classNamePropFor }
 
 const HELPER_NAME = '__lcssTw'
-const IMPORT_PATH = 'lunarcss/runtime'
+const IMPORT_PATH = 'lunar-css/runtime'
 
 export function transformClassNames(input: TransformInput): TransformOutput {
   const { src, filename } = input

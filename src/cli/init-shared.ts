@@ -75,13 +75,13 @@ export function ensureTsconfigTypes(
   if (!existingTypes) {
     return null
   }
-  if (existingTypes.includes('lunarcss/types')) {
+  if (existingTypes.includes('lunar-css/types')) {
     return { label: 'tsconfig.json', result: { path, status: 'unchanged' } }
   }
 
   json.compilerOptions = {
     ...(json.compilerOptions ?? {}),
-    types: [...existingTypes, 'lunarcss/types'],
+    types: [...existingTypes, 'lunar-css/types'],
   }
   const next = `${JSON.stringify(json, null, 2)}\n`
   return {
@@ -92,9 +92,9 @@ export function ensureTsconfigTypes(
   }
 }
 
-const TYPES_REFERENCE = '/// <reference types="lunarcss/types" />\n'
+const TYPES_REFERENCE = '/// <reference types="lunar-css/types" />\n'
 
-// Insert a triple-slash reference to lunarcss/types in the project's entry
+// Insert a triple-slash reference to lunar-css/types in the project's entry
 // file when tsconfig.json doesn't have an explicit `types` array. Idempotent.
 export function ensureTypesReference(
   projectRoot: string,
@@ -118,7 +118,7 @@ export function ensureTypesReference(
     const full = join(projectRoot, rel)
     if (!existsSync(full)) continue
     const prev = readFileSync(full, 'utf8')
-    if (prev.includes('lunarcss/types')) {
+    if (prev.includes('lunar-css/types')) {
       return { label: rel, result: { path: full, status: 'unchanged' } }
     }
     const next = `${TYPES_REFERENCE}${prev}`
@@ -132,7 +132,7 @@ export function ensureTypesReference(
   return null
 }
 
-// Web styling pipeline (Tailwind v4 + lunarcss/web/plugin) for native projects
+// Web styling pipeline (Tailwind v4 + lunar-css/web/plugin) for native projects
 // that also target web (Expo Web, RN Bare with react-native-web). Three
 // outputs:
 //   1. global.css with `@import "tailwindcss"`.
@@ -142,7 +142,7 @@ export function ensureTypesReference(
 
 const GLOBAL_CSS_BODY = '@import "tailwindcss";\n'
 
-const POSTCSS_CONFIG_BODY = `const lunarcssMod = require('lunarcss/web/plugin')
+const POSTCSS_CONFIG_BODY = `const lunarcssMod = require('lunar-css/web/plugin')
 const lunarcss = lunarcssMod.default ?? lunarcssMod
 
 module.exports = {
