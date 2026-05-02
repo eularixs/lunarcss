@@ -87,11 +87,27 @@ jobs:
           NEW_VERSION: ${{ steps.bump.outputs.new_version }}
         run: |
           git add package.json
-          git commit -m "chore: release v${NEW_VERSION}"
-          git tag "v${NEW_VERSION}"
+          git commit -m "chore: release ${NEW_VERSION}"
+          # Tag name matches the npm version exactly (no `v` prefix). Aligns
+          # `git ls-remote --tags` output with `npm view @lunar-kit/css versions`.
+          git tag "${NEW_VERSION}"
           git push origin main --follow-tags
+          echo "::notice title=Tag pushed::${NEW_VERSION} pushed to origin/main"
 
       - name: Publish to npm
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Create a GitHub Release page for the freshly-pushed tag. Auto-generates
+      # release notes from merged PRs since the last release. Runs only after
+      # `npm publish` succeeds so the Release and the npm version stay in sync.
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.bump.outputs.new_version }}
+          name: ${{ steps.bump.outputs.new_version }}
+          generate_release_notes: true
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
