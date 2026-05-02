@@ -1,6 +1,6 @@
 {
   "name": "@lunar-kit/css",
-  "version": "0.2.0-beta.0",
+  "version": "0.2.0-beta.1",
   "description": "Plug-and-play Tailwind v4 styling engine for React Native and Web",
   "license": "MIT",
   "author": "Eularix Team",
